@@ -29,7 +29,7 @@ export default function LoginForm() {
         email: user.email,
       });
 
-      navigate("/test");
+      navigate("/");
 
       // redirect handled by AuthContext / ProtectedRoute
     } catch (err: any) {
