@@ -1,12 +1,17 @@
-import type { Timestamp } from "firebase/firestore";
-
 export type UserRole = "staff" | "admin";
 export type AuthProvider = "email" | "google" | "other";
 
 export interface UserProfile {
-  uid: string; // Firebase Auth UID
-  email: string | null; // User email
-  role: UserRole; // Role: staff | admin
-  provider: AuthProvider; // Auth method: Email/Password or OAuth
-  createdAt: Timestamp;
+  uid: string;
+  email: string;
+  role: UserRole;
+  provider: AuthProvider;
+  createdAt: any;
 }
+
+// 👇 input type for profile creation
+export type CreateUserProfileInput = {
+  uid: string;
+  email: string;
+  provider?: AuthProvider;
+};

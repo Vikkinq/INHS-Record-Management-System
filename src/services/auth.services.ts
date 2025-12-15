@@ -1,3 +1,5 @@
+const googleProvider = new GoogleAuthProvider();
+
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -19,8 +21,7 @@ export const loginWithEmail = async (email: string, password: string) => {
 };
 
 export const loginWithGoogle = async () => {
-  const provider = new GoogleAuthProvider();
-  const result = await signInWithPopup(auth, provider);
+  const result = await signInWithPopup(auth, googleProvider);
   return result.user;
 };
 

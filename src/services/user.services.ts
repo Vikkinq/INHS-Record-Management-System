@@ -1,16 +1,17 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../config/firebase";
-import type { UserProfile } from "../types/User";
+import type { CreateUserProfileInput } from "../types/User";
 
-export const createUserProfile = async (user: UserProfile) => {
-  const userRef = doc(db, "users", user.uid);
+export const createUserProfile = async (input: CreateUserProfileInput) => {
+  const userRef = doc(db, "users", input.uid);
   const snap = await getDoc(userRef);
 
   if (!snap.exists()) {
     await setDoc(userRef, {
-      email: user.email,
+      email: input.email,
       role: "staff",
-      createdAt: new Date(),
+      provider: input.provider ?? "email",
+      createdAt: serverTimestamp(),
     });
   }
 };

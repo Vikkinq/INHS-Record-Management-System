@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, serverTimestamp, Timestamp } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp } from "firebase/firestore";
 
 import { auth, db } from "../config/firebase";
 import type { UserProfile, AuthProvider } from "../types/User";
@@ -24,12 +24,16 @@ export const AuthContextProvider = ({ children }: any) => {
           "google.com": "google",
         };
 
+        if (!firebaseUser.email) {
+          throw new Error("No email available for this user");
+        }
+
         setUser({
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           role: snap.data()?.role || "staff",
           provider: providerMap[providerId] ?? "other",
-          createdAt: snap.data()?.createdAt || (serverTimestamp() as unknown as Timestamp),
+          createdAt: snap.data()?.createdAt || serverTimestamp(),
         });
       } else {
         setUser(null);
