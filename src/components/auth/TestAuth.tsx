@@ -1,5 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 
+import Sidebar from "../../app/layouts/Sidebar";
+
 export default function TestAuth() {
   const { user, loading } = useAuth();
 
@@ -7,6 +9,7 @@ export default function TestAuth() {
 
   return (
     <div>
+      <Sidebar />
       <h1>Auth Test</h1>
       <pre>{JSON.stringify(user, null, 2)}</pre>
     </div>
