@@ -15,7 +15,7 @@ interface SidebarProps {
 
 export default function Sidebar({ role = "staff" }: SidebarProps) {
   return (
-    <aside className="h-screen w-64 bg-slate-900 text-slate-100 flex flex-col">
+    <aside className="fixed left-0 top-0 z-50 h-screen w-64 bg-slate-900 text-slate-100 flex flex-col">
       {/* Header */}
       <div className="px-6 py-5 border-b border-slate-800">
         <h1 className="text-lg font-bold tracking-wide">School RMS</h1>
