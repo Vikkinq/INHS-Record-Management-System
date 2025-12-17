@@ -1,6 +1,18 @@
+import { useState, useEffect } from "react";
+
 import Sidebar from "../../app/layouts/Sidebar";
+import { useAuth } from "../../context/AuthContext";
+
+import FileUploadModal from "./AddRecordModal";
 
 export default function MainContent() {
+  const [showModal, setShowModal] = useState(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    console.log(`Logged in User: `, user);
+  }, [user]);
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Sidebar */}
@@ -18,8 +30,20 @@ export default function MainContent() {
             className="w-64 rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />
 
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white">+ Add Record</button>
+          <button
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white "
+            onClick={() => setShowModal(true)}
+          >
+            + Add Record
+          </button>
         </div>
+
+        {showModal && user && (
+          <FileUploadModal
+            onClose={() => setShowModal(false)}
+            user={user} // pass the whole user object
+          />
+        )}
 
         {/* Table */}
         <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
