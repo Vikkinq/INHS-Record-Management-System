@@ -1,10 +1,10 @@
 export interface FileRecord {
-  fileId: string; // Firestore auto-generated ID
-  employeeId: string; // reference to Employee
+  fileId: string;
+  employeeId: string;
   fileName: string;
   fileType: FileType;
-  fileUrl: string; // Supabase Storage URL
-  uploadedBy: string; // AppUser.uid
+  fileUrl: string;
+  uploadedBy: string;
   uploadedAt: Date;
   createdAt: Date;
 }
