@@ -1,6 +1,6 @@
 import { logout } from "../../services/auth.services";
 
-import { Upload, File, Users, Clock, Star, Trash2, Settings, HelpCircle, HardDrive, LogOut } from "lucide-react";
+import { Upload, File, Users, Clock, Settings, HelpCircle, HardDrive, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type SidebarProps = {

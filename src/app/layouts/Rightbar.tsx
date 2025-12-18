@@ -1,4 +1,4 @@
-import { X, Users, Star, Trash2, FolderPlus, FileText, ImageIcon, Video, Music, Archive } from "lucide-react";
+import { X, Users, Star, Trash2, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function RightBar() {
