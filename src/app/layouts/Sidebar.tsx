@@ -1,56 +1,71 @@
-import { NavLink } from "react-router-dom";
 import { logout } from "../../services/auth.services";
 
-const navItems = [
-  { label: "Dashboard", path: "/dashboard" },
-  { label: "Employee Records", path: "/records" },
-  { label: "Upload Files", path: "/upload" },
-  { label: "Reports", path: "/reports" },
-  { label: "Users", path: "/users", adminOnly: true },
-];
+import { Upload, File, Users, Clock, Star, Trash2, Settings, HelpCircle, HardDrive, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-interface SidebarProps {
+type SidebarProps = {
+  onClick?: () => void; // optional function prop
   role?: "admin" | "staff";
-}
+};
 
-export default function Sidebar({ role = "staff" }: SidebarProps) {
+export default function Sidebar({ onClick, role = "staff" }: SidebarProps) {
   return (
-    <aside className="fixed left-0 top-0 z-50 h-screen w-64 bg-slate-900 text-slate-100 flex flex-col">
-      {/* Header */}
-      <div className="px-6 py-5 border-b border-slate-800">
-        <h1 className="text-lg font-bold tracking-wide">School RMS</h1>
-        <p className="text-xs text-slate-400 mt-1">201 Files Management</p>
+    <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
+      <div className="p-4 border-b border-sidebar-border">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+            <HardDrive className="w-6 h-6 text-primary-foreground" />
+          </div>
+          <span className="text-xl font-semibold text-foreground">INHS</span>
+        </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 py-4 space-y-1">
-        {navItems.map((item) => {
-          if (item.adminOnly && role !== "admin") return null;
+      <div className="p-4">
+        <Button
+          className="w-full justify-start gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={onClick}
+        >
+          <Upload className="w-5 h-5" />
+          New
+        </Button>
+      </div>
 
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `block rounded-lg px-4 py-2 text-sm font-medium transition ${
-                  isActive ? "bg-blue-600 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          );
-        })}
+      <nav className="flex-1 overflow-y-auto px-3">
+        <div className="space-y-1">
+          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
+            <Users className="w-5 h-5" />
+            <span className="text-sm font-medium">All Drives</span>
+          </button>
+          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
+            <File className="w-5 h-5" />
+            <span className="text-sm font-medium">My Drive</span>
+          </button>
+
+          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
+            <Clock className="w-5 h-5" />
+            <span className="text-sm font-medium">Recent</span>
+          </button>
+        </div>
+
+        <div className="border-t border-sidebar-border my-3" />
+
+        <div className="space-y-1">
+          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
+            <Settings className="w-5 h-5" />
+            <span className="text-sm font-medium">Settings</span>
+          </button>
+          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
+            <HelpCircle className="w-5 h-5" />
+            <span className="text-sm font-medium">Help</span>
+          </button>
+        </div>
       </nav>
 
-      {/* Footer */}
-      <div className="px-4 py-4 border-t border-slate-800">
-        <button
-          onClick={logout}
-          className="w-full rounded-lg bg-slate-800 py-2 text-sm font-medium text-slate-300 hover:bg-red-600 hover:text-white transition"
-        >
+      <div className="p-4 border-t border-sidebar-border mt-auto">
+        <Button variant="outline" className="w-full justify-start gap-2 " onClick={logout}>
+          <LogOut className="w-5 h-5" />
           Logout
-        </button>
+        </Button>
         <p className="mt-3 text-center text-xs text-slate-500">© {new Date().getFullYear()} School RMS</p>
       </div>
     </aside>

@@ -4,9 +4,10 @@ export interface FileRecord {
   fileName: string;
   fileType: FileType;
   fileUrl: string;
+  category: string;
   uploadedBy: string;
   uploadedAt: Date;
   createdAt: Date;
 }
 
-export type FileType = "pdf" | "docx" | "doc" | "other";
+export type FileType = "pdf" | "docx" | "doc";

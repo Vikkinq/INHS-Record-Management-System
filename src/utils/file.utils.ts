@@ -26,6 +26,7 @@ export const getFileType = (file: File): FileType => {
     case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
       return "docx";
     default:
-      return "other";
+      // Should never happen if validation is done before upload
+      throw new Error("Unsupported file type");
   }
 };

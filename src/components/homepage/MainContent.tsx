@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
-
-import Sidebar from "../../app/layouts/Sidebar";
 import { useAuth } from "../../context/AuthContext";
-
 import FileUploadModal from "./AddRecordModal";
 
 export default function MainContent() {
@@ -10,42 +7,18 @@ export default function MainContent() {
   const { user } = useAuth();
 
   useEffect(() => {
-    console.log(`Logged in User: `, user);
+    console.log("Logged in User: ", user);
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Sidebar */}
-      <Sidebar />
-
-      {/* Page Content */}
-      <main className="ml-64 p-6">
+    <div className="flex-1 min-h-screen bg-slate-50">
+      <main className="p-6">
         <h1 className="text-xl font-bold text-slate-800 mb-4">Employee Records (201 Files)</h1>
 
-        {/* Top Controls */}
-        <div className="flex items-center justify-between mb-4">
-          <input
-            type="text"
-            placeholder="Search employee..."
-            className="w-64 rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
+        {/* Modal */}
+        {showModal && user && <FileUploadModal onClose={() => setShowModal(false)} user={user} />}
 
-          <button
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white "
-            onClick={() => setShowModal(true)}
-          >
-            + Add Record
-          </button>
-        </div>
-
-        {showModal && user && (
-          <FileUploadModal
-            onClose={() => setShowModal(false)}
-            user={user} // pass the whole user object
-          />
-        )}
-
-        {/* Table */}
+        {/* Employee Table */}
         <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
           <table className="w-full text-sm">
             <thead className="bg-slate-100 text-slate-700">
@@ -57,7 +30,6 @@ export default function MainContent() {
                 <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
-
             <tbody>
               <tr className="border-t hover:bg-slate-50">
                 <td className="px-4 py-3">Juan Dela Cruz</td>
@@ -70,7 +42,6 @@ export default function MainContent() {
                   <button className="text-red-600 hover:underline">Delete</button>
                 </td>
               </tr>
-
               <tr className="border-t hover:bg-slate-50">
                 <td className="px-4 py-3">Maria Santos</td>
                 <td className="px-4 py-3">Registrar</td>
@@ -90,8 +61,8 @@ export default function MainContent() {
         <div className="flex items-center justify-between mt-4 text-sm">
           <span className="text-slate-600">Showing 1–30 of 120</span>
           <div className="space-x-2">
-            <button className="rounded border px-3 py-1">Prev</button>
-            <button className="rounded border px-3 py-1">Next</button>
+            <button className="rounded border px-3 py-1 hover:bg-slate-100 transition-colors">Prev</button>
+            <button className="rounded border px-3 py-1 hover:bg-slate-100 transition-colors">Next</button>
           </div>
         </div>
       </main>
