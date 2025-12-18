@@ -1,13 +1,30 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import FileUploadModal from "./AddRecordModal";
+import type { FileRecord } from "@/types/Files";
+import { getFiles } from "@/services/file.services";
+
+import MainTable from "./MainTable";
 
 export default function MainContent() {
   const [showModal, setShowModal] = useState(false);
+  const [files, setFiles] = useState<FileRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
+  const fetchFiles = async () => {
+    const data = await getFiles();
+    setFiles(data);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    console.log("Logged in User: ", user);
+    try {
+      console.log("Logged in User: ", user);
+      fetchFiles();
+    } catch (err) {
+      console.error("Error Spotted", err);
+    }
   }, [user]);
 
   return (
@@ -23,37 +40,16 @@ export default function MainContent() {
           <table className="w-full text-sm">
             <thead className="bg-slate-100 text-slate-700">
               <tr>
-                <th className="px-4 py-3 text-left">Employee Name</th>
-                <th className="px-4 py-3 text-left">Position</th>
-                <th className="px-4 py-3 text-left">Department</th>
+                <th className="px-4 py-3 text-left">File Name</th>
+                <th className="px-4 py-3 text-left">Category</th>
+                <th className="px-4 py-3 text-left">Type</th>
+                <th className="px-4 py-3 text-left">Uploaded By</th>
                 <th className="px-4 py-3 text-left">Date Created</th>
                 <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              <tr className="border-t hover:bg-slate-50">
-                <td className="px-4 py-3">Juan Dela Cruz</td>
-                <td className="px-4 py-3">Teacher</td>
-                <td className="px-4 py-3">Science</td>
-                <td className="px-4 py-3">2024-01-12</td>
-                <td className="px-4 py-3 text-center space-x-2">
-                  <button className="text-blue-600 hover:underline">View</button>
-                  <button className="text-amber-600 hover:underline">Edit</button>
-                  <button className="text-red-600 hover:underline">Delete</button>
-                </td>
-              </tr>
-              <tr className="border-t hover:bg-slate-50">
-                <td className="px-4 py-3">Maria Santos</td>
-                <td className="px-4 py-3">Registrar</td>
-                <td className="px-4 py-3">Admin</td>
-                <td className="px-4 py-3">2024-02-05</td>
-                <td className="px-4 py-3 text-center space-x-2">
-                  <button className="text-blue-600 hover:underline">View</button>
-                  <button className="text-amber-600 hover:underline">Edit</button>
-                  <button className="text-red-600 hover:underline">Delete</button>
-                </td>
-              </tr>
-            </tbody>
+            {/* Main Table (tbody) */}
+            <MainTable files={files} />
           </table>
         </div>
 
