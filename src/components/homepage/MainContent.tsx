@@ -1,55 +1,33 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
-import FileUploadModal from "./AddRecordModal";
 import type { FileRecord } from "@/types/Files";
-import { getFiles } from "@/services/file.services";
-
 import MainTable from "./MainTable";
 
-export default function MainContent() {
-  const [showModal, setShowModal] = useState(false);
-  const [files, setFiles] = useState<FileRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+type MainContentProps = {
+  files: FileRecord[]; // <-- type the prop
+  selectedFile: FileRecord | null;
+  onFileClick: (file: FileRecord) => void;
+};
 
-  const fetchFiles = async () => {
-    const data = await getFiles();
-    setFiles(data);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    try {
-      console.log("Logged in User: ", user);
-      fetchFiles();
-    } catch (err) {
-      console.error("Error Spotted", err);
-    }
-  }, [user]);
-
+export default function MainContent({ files, selectedFile, onFileClick }: MainContentProps) {
   return (
     <div className="flex-1 min-h-screen bg-slate-50">
       <main className="p-6">
         <h1 className="text-xl font-bold text-slate-800 mb-4">Employee Records (201 Files)</h1>
 
-        {/* Modal */}
-        {showModal && user && <FileUploadModal onClose={() => setShowModal(false)} user={user} />}
-
         {/* Employee Table */}
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-100 text-slate-700">
+        <div className="border border-border rounded-lg overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-muted/50 border-b border-border">
               <tr>
-                <th className="px-4 py-3 text-left">File Name</th>
+                <th className="px-4 py-3 text-left">Name</th>
+                <th className="px-4 py-3 text-left">Owner</th>
+                <th className="px-4 py-3 text-left">Modified</th>
                 <th className="px-4 py-3 text-left">Category</th>
                 <th className="px-4 py-3 text-left">Type</th>
-                <th className="px-4 py-3 text-left">Uploaded By</th>
-                <th className="px-4 py-3 text-left">Date Created</th>
-                <th className="px-4 py-3 text-center">Actions</th>
+                <th className="px-4 py-3 text-left">Size</th>
               </tr>
             </thead>
             {/* Main Table (tbody) */}
-            <MainTable files={files} />
+            <MainTable files={files} onSelectFile={selectedFile} onFileClick={onFileClick} />
           </table>
         </div>
 

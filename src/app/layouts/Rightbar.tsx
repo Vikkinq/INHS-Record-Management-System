@@ -1,14 +1,22 @@
 import { X, Users, Star, Trash2, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { FileRecord } from "@/types/Files";
 
-export function RightBar() {
+type RightBarProps = {
+  selectedFile: FileRecord | null;
+  onClose: () => void;
+};
+
+export function RightBar({ selectedFile, onClose }: RightBarProps) {
+  if (!selectedFile) return null;
+
   return (
     <aside className="w-80 border-l border-gray-300 bg-white overflow-y-auto">
       <div className="p-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Details</h2>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>
         </div>
@@ -23,7 +31,7 @@ export function RightBar() {
 
           {/* File Name */}
           <div>
-            <h3 className="font-semibold text-base mb-1">Sample File</h3>
+            <h3 className="font-semibold text-base mb-1">{selectedFile.fileName}</h3>
             <p className="text-sm text-gray-500 capitalize">folder</p>
           </div>
 

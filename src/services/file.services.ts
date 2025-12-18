@@ -11,7 +11,7 @@ const filesCollection = collection(db, "files");
 // CREATE / UPLOAD
 export const uploadFile = async (
   file: File,
-  meta: Omit<FileRecord, "fileId" | "fileUrl" | "uploadedAt" | "createdAt">
+  meta: Omit<FileRecord, "fileId" | "fileUrl" | "uploadedAt" | "createdAt" | "fileSize">
 ) => {
   if (!isValidFileType(file)) {
     throw new Error("Invalid file type. Only PDF and Word documents are allowed.");
@@ -31,6 +31,7 @@ export const uploadFile = async (
     fileId: fileDocRef.id,
     ...meta,
     fileType,
+    fileSize: file.size,
     fileUrl: downloadUrl,
     uploadedAt: new Date(),
     createdAt: new Date(),

@@ -2,24 +2,27 @@ import type { FileRecord } from "@/types/Files";
 
 interface MainTableProps {
   files: FileRecord[];
-  onSelectFile?: (file: FileRecord) => void;
+  onSelectFile: FileRecord | null;
+  onFileClick: (file: FileRecord) => void;
 }
 
-export default function MainTable({ files }: MainTableProps) {
+export default function MainTable({ files, onSelectFile, onFileClick }: MainTableProps) {
   return (
     <tbody>
       {files.map((f) => (
-        <tr key={f.fileId} className="border-t hover:bg-slate-50">
+        <tr
+          key={f.fileId}
+          className={`cursor-pointer border-t hover:bg-muted/50 transition-colors ${
+            onSelectFile?.fileId === f.fileId ? "bg-primary/10" : ""
+          }`}
+          onClick={() => onFileClick(f)}
+        >
           <td className="px-4 py-3">{f.fileName}</td>
-          <td className="px-4 py-3">{f.category}</td>
-          <td className="px-4 py-3">{f.fileType}</td>
           <td className="px-4 py-3">{f.uploadedBy}</td>
           <td className="px-4 py-3">{new Date(f.uploadedAt).toLocaleDateString()}</td>
-          <td className="px-4 py-3 text-center space-x-2">
-            <button className="text-blue-600 hover:underline">View</button>
-            <button className="text-amber-600 hover:underline">Edit</button>
-            <button className="text-red-600 hover:underline">Delete</button>
-          </td>
+          <td className="px-4 py-3">{f.category}</td>
+          <td className="px-4 py-3">{f.fileType}</td>
+          <td>{(f.fileSize / (1024 * 1024)).toFixed(2)} MB</td>
         </tr>
       ))}
     </tbody>

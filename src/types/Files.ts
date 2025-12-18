@@ -3,6 +3,7 @@ export interface FileRecord {
   employeeId: string;
   fileName: string;
   fileType: FileType;
+  fileSize: number;
   fileUrl: string;
   category: string;
   uploadedBy: string;
