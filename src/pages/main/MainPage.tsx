@@ -9,6 +9,7 @@ import FileUploadModal from "@/components/homepage/AddRecordModal";
 import { useAuth } from "../../context/AuthContext";
 import type { FileRecord } from "@/types/Files";
 import { getFiles } from "@/services/file.services";
+import { deleteFile } from "@/services/file.services";
 
 export default function MainPage() {
   const [showModal, setShowModal] = useState(false);
@@ -21,6 +22,16 @@ export default function MainPage() {
   const handleFileClick = (file: FileRecord) => {
     setSelectedFile(file);
     setShowDetails(true);
+  };
+
+  const handleFileDelete = async (id: string) => {
+    try {
+      if (!window.confirm("Are you sure you want to delete this file?")) return;
+      await deleteFile(id);
+      setFiles((prev) => prev.filter((file) => file.fileId !== id));
+    } catch (err) {
+      console.log("Cannot Delete File", err);
+    }
   };
 
   const fetchFiles = async () => {
@@ -52,7 +63,13 @@ export default function MainPage() {
           <MainContent files={files} selectedFile={selectedFile} onFileClick={handleFileClick} />
 
           {/* Right sidebar fixed width */}
-          {showDetails && <RightBar selectedFile={selectedFile} onClose={() => setShowDetails(false)} />}
+          {showDetails && (
+            <RightBar
+              selectedFile={selectedFile}
+              onClose={() => setShowDetails(false)}
+              onDeleteFile={handleFileDelete}
+            />
+          )}
         </div>
       </div>
     </div>

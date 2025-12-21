@@ -1,13 +1,15 @@
 import { X, Users, Star, Trash2, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { FileRecord } from "@/types/Files";
+import { deleteFile } from "@/services/file.services";
 
 type RightBarProps = {
   selectedFile: FileRecord | null;
   onClose: () => void;
+  onDeleteFile: (id: string) => void;
 };
 
-export function RightBar({ selectedFile, onClose }: RightBarProps) {
+export function RightBar({ selectedFile, onClose, onDeleteFile }: RightBarProps) {
   if (!selectedFile) return null;
 
   return (
@@ -39,23 +41,19 @@ export function RightBar({ selectedFile, onClose }: RightBarProps) {
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Type</span>
-              <span className="font-medium capitalize">folder</span>
+              <span className="font-medium capitalize">{selectedFile.fileType}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Size</span>
-              <span className="font-medium">2 MB</span>
+              <span className="font-medium">{(selectedFile.fileSize / (1024 * 1024)).toFixed(2)} MB</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Owner</span>
-              <span className="font-medium">John Doe</span>
+              <span className="font-medium">{selectedFile.uploadedBy}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Modified</span>
               <span className="font-medium">2024-12-18</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Shared</span>
-              <span className="font-medium">Yes</span>
             </div>
           </div>
 
@@ -63,18 +61,19 @@ export function RightBar({ selectedFile, onClose }: RightBarProps) {
           <div className="space-y-2 pt-4 border-t border-gray-300">
             <Button variant="outline" className="w-full justify-start gap-2 bg-transparent">
               <Users className="w-4 h-4" />
-              Share
+              Download
             </Button>
             <Button variant="outline" className="w-full justify-start gap-2 bg-transparent">
               <Star className="w-4 h-4" />
-              Add to Starred
+              Update File
             </Button>
             <Button
               variant="outline"
               className="w-full justify-start gap-2 text-red-600 hover:text-red-600 bg-transparent"
+              onClick={() => onDeleteFile(selectedFile.fileId)}
             >
               <Trash2 className="w-4 h-4" />
-              Move to Trash
+              Remove File
             </Button>
           </div>
         </div>
