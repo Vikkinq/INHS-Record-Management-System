@@ -5,6 +5,7 @@ import Sidebar from "@/app/layouts/Sidebar";
 import { NavBar } from "@/app/layouts/Navbar";
 import { RightBar } from "@/app/layouts/Rightbar";
 import FileUploadModal from "@/components/homepage/AddRecordModal";
+import UpdateRecordModal from "@/components/homepage/UpdateRecordModal";
 
 import { useAuth } from "../../context/AuthContext";
 import type { FileRecord } from "@/types/Files";
@@ -18,18 +19,32 @@ export default function MainPage() {
   const [showDetails, setShowDetails] = useState(false);
   const { user } = useAuth();
 
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [fileToUpdate, setFileToUpdate] = useState<FileRecord | null>(null);
+
+  const handleOpenUpdateModal = (file: FileRecord) => {
+    setFileToUpdate(file);
+    setShowUpdateModal(true);
+  };
+
+  const handleUpdateFile = (updatedFile: FileRecord) => {
+    setFiles((prev) => prev.map((f) => (f.fileId === updatedFile.fileId ? updatedFile : f)));
+  };
+
   const handleFileClick = (file: FileRecord) => {
     setSelectedFile(file);
     setShowDetails(true);
   };
 
-  const handleFileDelete = async (id: string) => {
+  const handleFileDelete = async (file: FileRecord) => {
     try {
       if (!window.confirm("Are you sure you want to delete this file?")) return;
-      await deleteFile(id);
-      setFiles((prev) => prev.filter((file) => file.fileId !== id));
+
+      await deleteFile(file); // deletes from Storage + Firestore
+
+      setFiles((prev) => prev.filter((f) => f.fileId !== file.fileId));
     } catch (err) {
-      console.log("Cannot Delete File", err);
+      console.error("Cannot delete file:", err);
     }
   };
 
@@ -62,11 +77,20 @@ export default function MainPage() {
           <MainContent files={files} selectedFile={selectedFile} onFileClick={handleFileClick} />
 
           {/* Right sidebar fixed width */}
-          {showDetails && (
+          {showDetails && selectedFile && (
             <RightBar
               selectedFile={selectedFile}
               onClose={() => setShowDetails(false)}
               onDeleteFile={handleFileDelete}
+              onUpdateClick={handleOpenUpdateModal} // new prop
+            />
+          )}
+
+          {showUpdateModal && fileToUpdate && (
+            <UpdateRecordModal
+              file={fileToUpdate}
+              onClose={() => setShowUpdateModal(false)}
+              onUpdate={handleUpdateFile}
             />
           )}
         </div>

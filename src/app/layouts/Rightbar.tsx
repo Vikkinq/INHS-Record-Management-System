@@ -8,10 +8,11 @@ import { formatDate } from "@/utils/general.utils";
 type RightBarProps = {
   selectedFile: FileRecord | null;
   onClose: () => void;
-  onDeleteFile: (id: string) => void;
+  onDeleteFile: (file: FileRecord) => void;
+  onUpdateClick: (file: FileRecord) => void;
 };
 
-export function RightBar({ selectedFile, onClose, onDeleteFile }: RightBarProps) {
+export function RightBar({ selectedFile, onClose, onDeleteFile, onUpdateClick }: RightBarProps) {
   const { user } = useAuth();
 
   if (!selectedFile) return null;
@@ -71,7 +72,11 @@ export function RightBar({ selectedFile, onClose, onDeleteFile }: RightBarProps)
             </Button>
 
             {canEdit && (
-              <Button variant="outline" className="w-full justify-start gap-2 bg-transparent">
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2 bg-transparent"
+                onClick={() => selectedFile && onUpdateClick(selectedFile)}
+              >
                 <Star className="w-4 h-4" />
                 Update File
               </Button>
@@ -81,7 +86,7 @@ export function RightBar({ selectedFile, onClose, onDeleteFile }: RightBarProps)
               <Button
                 variant="outline"
                 className="w-full justify-start gap-2 text-red-600 hover:text-red-600 bg-transparent"
-                onClick={() => onDeleteFile(selectedFile.fileId)}
+                onClick={() => selectedFile && onDeleteFile(selectedFile)}
               >
                 <Trash2 className="w-4 h-4" />
                 Remove File

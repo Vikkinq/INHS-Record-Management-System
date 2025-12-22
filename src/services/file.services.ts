@@ -1,6 +1,6 @@
 import { db, storage } from "../config/firebase";
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import type { FileRecord } from "../types/Files";
 
 import { getFileType, isValidFileType, isValidFileSize } from "../utils/file.utils";
@@ -11,7 +11,7 @@ const filesCollection = collection(db, "files");
 // CREATE / UPLOAD
 export const uploadFile = async (
   file: File,
-  meta: Omit<FileRecord, "fileId" | "fileUrl" | "uploadedAt" | "createdAt" | "fileSize">
+  meta: Omit<FileRecord, "fileId" | "fileUrl" | "uploadedAt" | "createdAt" | "fileSize" | "storagePath">
 ) => {
   if (!isValidFileType(file)) {
     throw new Error("Invalid file type. Only PDF and Word documents are allowed.");
@@ -21,9 +21,17 @@ export const uploadFile = async (
     throw new Error("File too large. Maximum allowed size is 10MB.");
   }
 
-  const storageRef = ref(storage, `files/${file.name}-${Date.now()}`);
+  // Generate a unique path in Storage
+  const storagePath = `files/${file.name}-${Date.now()}`;
+  const storageRef = ref(storage, storagePath);
+
+  // Upload the file
   await uploadBytes(storageRef, file);
+
+  // Get the public download URL
   const downloadUrl = await getDownloadURL(storageRef);
+
+  // Prepare Firestore document
   const fileDocRef = doc(filesCollection);
   const fileType = getFileType(file);
 
@@ -33,11 +41,14 @@ export const uploadFile = async (
     fileType,
     fileSize: file.size,
     fileUrl: downloadUrl,
+    storagePath, // <-- store the path so we can replace/delete later
     uploadedAt: new Date(),
     createdAt: new Date(),
   };
 
+  // Save metadata in Firestore
   await setDoc(fileDocRef, newFile);
+
   return newFile;
 };
 
@@ -61,7 +72,19 @@ export const updateFile = async (fileId: string, updatedData: Partial<FileRecord
 };
 
 // DELETE
-export const deleteFile = async (fileId: string) => {
-  const docRef = doc(filesCollection, fileId);
-  await deleteDoc(docRef);
+export const deleteFile = async (file: FileRecord) => {
+  try {
+    // 1. Delete the file from Storage
+    if (file.storagePath) {
+      const storageRef = ref(storage, file.storagePath);
+      await deleteObject(storageRef);
+    }
+
+    // 2. Delete the document from Firestore
+    const docRef = doc(db, "files", file.fileId);
+    await deleteDoc(docRef);
+  } catch (err) {
+    console.error("Failed to delete file:", err);
+    throw err;
+  }
 };

@@ -125,8 +125,9 @@ export default function FileUploadModal({ onClose, user }: FileUploadModalProps)
             Cancel
           </button>
           <button
-            className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50"
             onClick={handleUpload}
+            disabled={selectedFiles.length === 0 || !category}
           >
             Upload
           </button>

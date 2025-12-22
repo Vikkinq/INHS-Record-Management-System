@@ -5,6 +5,7 @@ export interface FileRecord {
   fileType: FileType;
   fileSize: number;
   fileUrl: string;
+  storagePath: string;
   category: string;
   uploadedBy: string;
   uploadedAt: Date;
