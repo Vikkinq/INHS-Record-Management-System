@@ -1,4 +1,5 @@
-import type { FileType } from "../types/Files";
+import type { FileType, FileRecord } from "../types/Files";
+import type { UserProfile } from "@/types/User";
 
 export const MAX_FILE_SIZE_MB = 10;
 export const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
@@ -29,4 +30,10 @@ export const getFileType = (file: File): FileType => {
       // Should never happen if validation is done before upload
       throw new Error("Unsupported file type");
   }
+};
+
+export const canEditFile = (file: FileRecord, user: UserProfile): boolean => {
+  if (!user) return false;
+
+  return user.role === "admin" || file.employeeId === user.uid;
 };

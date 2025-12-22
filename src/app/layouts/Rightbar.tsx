@@ -1,7 +1,8 @@
 import { X, Users, Star, Trash2, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { FileRecord } from "@/types/Files";
-import { deleteFile } from "@/services/file.services";
+import { canEditFile } from "@/utils/file.utils";
+import { useAuth } from "@/context/AuthContext";
 
 type RightBarProps = {
   selectedFile: FileRecord | null;
@@ -10,7 +11,11 @@ type RightBarProps = {
 };
 
 export function RightBar({ selectedFile, onClose, onDeleteFile }: RightBarProps) {
+  const { user } = useAuth();
+
   if (!selectedFile) return null;
+
+  const canEdit = user && canEditFile(selectedFile, user);
 
   return (
     <aside className="w-80 border-l border-gray-300 bg-white overflow-y-auto">
@@ -63,18 +68,24 @@ export function RightBar({ selectedFile, onClose, onDeleteFile }: RightBarProps)
               <Users className="w-4 h-4" />
               Download
             </Button>
-            <Button variant="outline" className="w-full justify-start gap-2 bg-transparent">
-              <Star className="w-4 h-4" />
-              Update File
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-start gap-2 text-red-600 hover:text-red-600 bg-transparent"
-              onClick={() => onDeleteFile(selectedFile.fileId)}
-            >
-              <Trash2 className="w-4 h-4" />
-              Remove File
-            </Button>
+
+            {canEdit && (
+              <Button variant="outline" className="w-full justify-start gap-2 bg-transparent">
+                <Star className="w-4 h-4" />
+                Update File
+              </Button>
+            )}
+
+            {canEdit && (
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2 text-red-600 hover:text-red-600 bg-transparent"
+                onClick={() => onDeleteFile(selectedFile.fileId)}
+              >
+                <Trash2 className="w-4 h-4" />
+                Remove File
+              </Button>
+            )}
           </div>
         </div>
       </div>

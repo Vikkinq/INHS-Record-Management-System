@@ -8,8 +8,7 @@ import FileUploadModal from "@/components/homepage/AddRecordModal";
 
 import { useAuth } from "../../context/AuthContext";
 import type { FileRecord } from "@/types/Files";
-import { getFiles } from "@/services/file.services";
-import { deleteFile } from "@/services/file.services";
+import { getFiles, deleteFile } from "@/services/file.services";
 
 export default function MainPage() {
   const [showModal, setShowModal] = useState(false);
