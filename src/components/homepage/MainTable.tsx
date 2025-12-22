@@ -1,4 +1,5 @@
 import type { FileRecord } from "@/types/Files";
+import { formatDate } from "@/utils/general.utils";
 
 interface MainTableProps {
   files: FileRecord[];
@@ -19,7 +20,7 @@ export default function MainTable({ files, onSelectFile, onFileClick }: MainTabl
         >
           <td className="px-4 py-3">{f.fileName}</td>
           <td className="px-4 py-3">{f.uploadedBy}</td>
-          <td className="px-4 py-3">{new Date(f.uploadedAt).toLocaleDateString()}</td>
+          <td className="px-4 py-3">{formatDate(f.uploadedAt)}</td>
           <td className="px-4 py-3">{f.category}</td>
           <td className="px-4 py-3">{f.fileType}</td>
           <td>{(f.fileSize / (1024 * 1024)).toFixed(2)} MB</td>

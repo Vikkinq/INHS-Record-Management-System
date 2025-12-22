@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import type { FileRecord } from "@/types/Files";
 import { canEditFile } from "@/utils/file.utils";
 import { useAuth } from "@/context/AuthContext";
+import { formatDate } from "@/utils/general.utils";
 
 type RightBarProps = {
   selectedFile: FileRecord | null;
@@ -58,7 +59,7 @@ export function RightBar({ selectedFile, onClose, onDeleteFile }: RightBarProps)
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Modified</span>
-              <span className="font-medium">2024-12-18</span>
+              <span className="font-medium">{formatDate(selectedFile.uploadedAt)}</span>
             </div>
           </div>
 
