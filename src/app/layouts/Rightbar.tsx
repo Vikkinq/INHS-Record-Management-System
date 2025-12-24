@@ -19,6 +19,10 @@ export function RightBar({ selectedFile, onClose, onDeleteFile, onUpdateClick }:
 
   const canEdit = user && canEditFile(selectedFile, user);
 
+  const handleDownload = (fileUrl: string) => {
+    window.open(fileUrl, "_blank");
+  };
+
   return (
     <aside className="w-80 border-l border-gray-300 bg-white overflow-y-auto">
       <div className="p-4">
@@ -66,7 +70,11 @@ export function RightBar({ selectedFile, onClose, onDeleteFile, onUpdateClick }:
 
           {/* Actions */}
           <div className="space-y-2 pt-4 border-t border-gray-300">
-            <Button variant="outline" className="w-full justify-start gap-2 bg-transparent">
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 bg-transparent"
+              onClick={() => handleDownload(selectedFile.fileUrl)}
+            >
               <Users className="w-4 h-4" />
               Download
             </Button>

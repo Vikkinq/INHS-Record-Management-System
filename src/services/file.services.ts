@@ -13,7 +13,7 @@ import {
   limit,
 } from "firebase/firestore";
 
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject, getStorage } from "firebase/storage";
 import type { FileRecord } from "../types/Files";
 
 import { getFileType, isValidFileType, isValidFileSize } from "../utils/file.utils";
