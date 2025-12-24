@@ -23,6 +23,8 @@ export default function MainPage() {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [fileToUpdate, setFileToUpdate] = useState<FileRecord | null>(null);
 
+  const [sidebarOpen, setSidebarOpen] = useState(false); // <-- new
+
   const handleOpenUpdateModal = (file: FileRecord) => {
     setFileToUpdate(file);
     setShowUpdateModal(true);
@@ -70,15 +72,23 @@ export default function MainPage() {
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      <Sidebar onClick={() => setShowModal(true)} />
+      {/* Sidebar */}
+      <Sidebar
+        onClick={() => setShowModal(true)}
+        role={user?.role}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
+      {/* Overlay for mobile when sidebar open */}
+      {sidebarOpen && <div className="fixed inset-0 bg-black/50 md:hidden" onClick={() => setSidebarOpen(false)} />}
+
+      {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <NavBar />
-
+        <NavBar onBurgerClick={() => setSidebarOpen(true)} /> {/* Pass burger toggle */}
         {showModal && user && (
           <FileUploadModal onClose={() => setShowModal(false)} user={user} onUploaded={handleFileUploaded} />
         )}
-
         <div className="flex-1 flex overflow-hidden">
           {/* Main content scrollable */}
           <MainContent files={files} selectedFile={selectedFile} onFileClick={handleFileClick} />
@@ -89,7 +99,7 @@ export default function MainPage() {
               selectedFile={selectedFile}
               onClose={() => setShowDetails(false)}
               onDeleteFile={handleFileDelete}
-              onUpdateClick={handleOpenUpdateModal} // new prop
+              onUpdateClick={handleOpenUpdateModal}
             />
           )}
 

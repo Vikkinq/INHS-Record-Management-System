@@ -71,58 +71,60 @@ export default function MainContent({ files, selectedFile, onFileClick }: MainCo
   return (
     <main className="flex-1 flex flex-col overflow-hidden bg-slate-50">
       {/* Toolbar */}
-      <div className="sticky top-0 z-10 bg-white border-b px-6 py-4">
-        <div className="flex items-center justify-between mb-3">
+      <div className="sticky top-0 z-10 bg-white border-b px-4 md:px-6 py-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3 md:gap-0">
           <h1 className="text-xl font-bold text-slate-800">Employee Records ({filteredData.length} Files)</h1>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <input
-            type="text"
-            placeholder="Search file name..."
-            value={search}
-            onChange={(e) => handleFilterChange(setSearch)(e.target.value)}
-            className="w-64 rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-          />
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mt-2 md:mt-0">
+            <input
+              type="text"
+              placeholder="Search file name..."
+              value={search}
+              onChange={(e) => handleFilterChange(setSearch)(e.target.value)}
+              className="w-full md:w-64 rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            />
 
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as "createdAt" | "fileName")}
-            className="rounded-lg border px-3 py-2 text-sm"
-          >
-            <option value="createdAt">Sort by Date</option>
-            <option value="fileName">Sort by Name</option>
-          </select>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as "createdAt" | "fileName")}
+              className="w-full md:w-auto rounded-lg border px-3 py-2 text-sm"
+            >
+              <option value="createdAt">Sort by Date</option>
+              <option value="fileName">Sort by Name</option>
+            </select>
 
-          <select
-            value={sortDir}
-            onChange={(e) => setSortDir(e.target.value as "asc" | "desc")}
-            className="rounded-lg border px-3 py-2 text-sm"
-          >
-            <option value="desc">Descending</option>
-            <option value="asc">Ascending</option>
-          </select>
+            <select
+              value={sortDir}
+              onChange={(e) => setSortDir(e.target.value as "asc" | "desc")}
+              className="w-full md:w-auto rounded-lg border px-3 py-2 text-sm"
+            >
+              <option value="desc">Descending</option>
+              <option value="asc">Ascending</option>
+            </select>
 
-          <select
-            value={category}
-            onChange={(e) => handleFilterChange(setCategory)(e.target.value)}
-            className="rounded-lg border px-3 py-2 text-sm"
-          >
-            <option value="">All Categories</option>
-            <option value="Report Card">Report Card</option>
-            <option value="Transcript">Transcript</option>
-            <option value="Certificate">Certificate</option>
-            <option value="Enrollment">Enrollment</option>
-            <option value="Medical">Medical</option>
-            <option value="Other">Other</option>
-          </select>
+            <select
+              value={category}
+              onChange={(e) => handleFilterChange(setCategory)(e.target.value)}
+              className="w-full md:w-auto rounded-lg border px-3 py-2 text-sm"
+            >
+              <option value="">All Categories</option>
+              <option value="Report Card">Report Card</option>
+              <option value="Transcript">Transcript</option>
+              <option value="Certificate">Certificate</option>
+              <option value="Enrollment">Enrollment</option>
+              <option value="Medical">Medical</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
         </div>
       </div>
 
       {/* Table */}
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="border rounded-lg overflow-hidden bg-white">
-          <table className="w-full">
+        <div className="border rounded-lg overflow-x-auto bg-white">
+          <table className="w-full min-w-150">
+            {" "}
+            {/* ensures horizontal scroll if needed */}
             <thead className="bg-muted/50 border-b">
               <tr>
                 <th className="px-4 py-3 text-left">Name</th>
@@ -133,7 +135,6 @@ export default function MainContent({ files, selectedFile, onFileClick }: MainCo
                 <th className="px-4 py-3 text-left">Size</th>
               </tr>
             </thead>
-
             <MainTable files={paginatedData} onSelectFile={selectedFile} onFileClick={onFileClick} />
           </table>
         </div>

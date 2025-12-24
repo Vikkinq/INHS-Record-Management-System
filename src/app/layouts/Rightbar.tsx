@@ -14,27 +14,29 @@ type RightBarProps = {
 
 export function RightBar({ selectedFile, onClose, onDeleteFile, onUpdateClick }: RightBarProps) {
   const { user } = useAuth();
-
   if (!selectedFile) return null;
-
   const canEdit = user && canEditFile(selectedFile, user);
 
-  const handleDownload = (fileUrl: string) => {
-    window.open(fileUrl, "_blank");
-  };
+  const handleDownload = (fileUrl: string) => window.open(fileUrl, "_blank");
 
   return (
-    <aside className="w-80 border-l border-gray-300 bg-white overflow-y-auto">
-      <div className="p-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Details</h2>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
+    <>
+      {/* Overlay for mobile */}
+      <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={onClose} />
 
-        <div className="space-y-6">
+      <aside
+        className="fixed right-0 top-0 h-full w-80 bg-white border-l border-gray-300 z-50 transform transition-transform duration-300
+          md:static md:translate-x-0 md:flex md:w-80
+          "
+      >
+        <div className="p-4 flex flex-col h-full overflow-y-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Details</h2>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+
           {/* File Icon */}
           <div className="flex justify-center py-6">
             <div className="w-20 h-20 rounded-lg bg-gray-200 flex items-center justify-center">
@@ -42,34 +44,35 @@ export function RightBar({ selectedFile, onClose, onDeleteFile, onUpdateClick }:
             </div>
           </div>
 
-          {/* File Name */}
-          <div>
-            <h3 className="font-semibold text-base mb-1">{selectedFile.fileName}</h3>
-            <p className="text-sm text-gray-500 capitalize">folder</p>
-          </div>
-
           {/* File Info */}
           <div className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Type</span>
-              <span className="font-medium capitalize">{selectedFile.fileType}</span>
+            <div>
+              <h3 className="font-semibold text-base mb-1">{selectedFile.fileName}</h3>
+              <p className="text-sm text-gray-500 capitalize">folder</p>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Size</span>
-              <span className="font-medium">{(selectedFile.fileSize / (1024 * 1024)).toFixed(2)} MB</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Owner</span>
-              <span className="font-medium">{selectedFile.uploadedBy}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Modified</span>
-              <span className="font-medium">{formatDate(selectedFile.uploadedAt)}</span>
+
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Type</span>
+                <span className="font-medium capitalize">{selectedFile.fileType}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Size</span>
+                <span className="font-medium">{(selectedFile.fileSize / (1024 * 1024)).toFixed(2)} MB</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Owner</span>
+                <span className="font-medium">{selectedFile.uploadedBy}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Modified</span>
+                <span className="font-medium">{formatDate(selectedFile.uploadedAt)}</span>
+              </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="space-y-2 pt-4 border-t border-gray-300">
+          <div className="space-y-2 pt-4 border-t border-gray-300 mt-auto">
             <Button
               variant="outline"
               className="w-full justify-start gap-2 bg-transparent"
@@ -102,7 +105,7 @@ export function RightBar({ selectedFile, onClose, onDeleteFile, onUpdateClick }:
             )}
           </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }
