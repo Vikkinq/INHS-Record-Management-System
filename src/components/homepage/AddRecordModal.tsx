@@ -1,15 +1,17 @@
 import { useState, useRef } from "react";
 import { uploadFile } from "../../services/file.services";
 import { getFileType } from "../../utils/file.utils";
+import type { FileRecord } from "@/types/Files";
 
 import { isValidFileType } from "../../utils/file.utils";
 
 interface FileUploadModalProps {
   onClose: () => void;
   user: { uid: string; displayName?: string | null; email: string }; // Auth user type
+  onUploaded: (file: FileRecord[]) => void;
 }
 
-export default function FileUploadModal({ onClose, user }: FileUploadModalProps) {
+export default function FileUploadModal({ onClose, user, onUploaded }: FileUploadModalProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [category, setCategory] = useState<string>(""); // default can be empty or "Other"
 
@@ -25,6 +27,7 @@ export default function FileUploadModal({ onClose, user }: FileUploadModalProps)
 
   const handleUpload = async () => {
     if (!user) return;
+    const uploaded: FileRecord[] = [];
     for (const file of selectedFiles) {
       try {
         if (!isValidFileType(file)) {
@@ -32,18 +35,21 @@ export default function FileUploadModal({ onClose, user }: FileUploadModalProps)
           continue;
         }
 
-        await uploadFile(file, {
+        const newFile = await uploadFile(file, {
           employeeId: user.uid, // reference employee
           uploadedBy: user.displayName || user.email, // current user
           fileName: file.name, // file name from frontend
           fileType: getFileType(file), // convert MIME to "pdf", "doc", etc
           category,
         });
+
+        uploaded.push(newFile);
       } catch (err) {
         console.error(err);
       }
     }
 
+    onUploaded(uploaded);
     setSelectedFiles([]);
     onClose();
   };

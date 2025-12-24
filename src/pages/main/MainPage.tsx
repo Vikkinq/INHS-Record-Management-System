@@ -19,12 +19,17 @@ export default function MainPage() {
   const [showDetails, setShowDetails] = useState(false);
   const { user } = useAuth();
 
+  const [signupModal, setSignupModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [fileToUpdate, setFileToUpdate] = useState<FileRecord | null>(null);
 
   const handleOpenUpdateModal = (file: FileRecord) => {
     setFileToUpdate(file);
     setShowUpdateModal(true);
+  };
+
+  const handleFileUploaded = (newFile: FileRecord[]) => {
+    setFiles((prev) => [...newFile, ...prev]);
   };
 
   const handleUpdateFile = (updatedFile: FileRecord) => {
@@ -70,7 +75,9 @@ export default function MainPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <NavBar />
 
-        {showModal && user && <FileUploadModal onClose={() => setShowModal(false)} user={user} />}
+        {showModal && user && (
+          <FileUploadModal onClose={() => setShowModal(false)} user={user} onUploaded={handleFileUploaded} />
+        )}
 
         <div className="flex-1 flex overflow-hidden">
           {/* Main content scrollable */}

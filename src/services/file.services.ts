@@ -1,5 +1,18 @@
 import { db, storage } from "../config/firebase";
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+} from "firebase/firestore";
+
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import type { FileRecord } from "../types/Files";
 
@@ -7,6 +20,14 @@ import { getFileType, isValidFileType, isValidFileSize } from "../utils/file.uti
 
 // Firestore collection
 const filesCollection = collection(db, "files");
+
+type FileQueryOptions = {
+  search?: string; // fileName search
+  category?: string; // filter by category
+  sortBy?: "createdAt" | "fileName"; // sort field
+  sortDir?: "asc" | "desc"; // sort direction
+  limitNum?: number; // max number of results
+};
 
 // CREATE / UPLOAD
 export const uploadFile = async (
@@ -87,4 +108,37 @@ export const deleteFile = async (file: FileRecord) => {
     console.error("Failed to delete file:", err);
     throw err;
   }
+};
+
+export const queryFiles = async ({
+  search = "",
+  category = "",
+  sortBy = "createdAt",
+  sortDir = "desc",
+  limitNum = 30,
+}: FileQueryOptions): Promise<FileRecord[]> => {
+  const constraints: any[] = [];
+
+  // Optional category filter
+  if (category) {
+    constraints.push(where("category", "==", category));
+  }
+
+  // Optional search (client-side is easier for contains)
+  constraints.push(orderBy(sortBy, sortDir));
+
+  // Limit results
+  constraints.push(limit(limitNum));
+
+  const q = query(filesCollection, ...constraints);
+  const snap = await getDocs(q);
+
+  let results = snap.docs.map((doc) => doc.data() as FileRecord);
+
+  // Client-side search
+  if (search.trim()) {
+    results = results.filter((file) => file.fileName.toLowerCase().startsWith(search.toLowerCase()));
+  }
+
+  return results;
 };
