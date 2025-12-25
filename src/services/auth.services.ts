@@ -26,5 +26,11 @@ export const loginWithGoogle = async () => {
 };
 
 export const logout = async () => {
-  await signOut(auth);
+  try {
+    if (!window.confirm("Are you sure you want to Logout?")) return;
+    await signOut(auth);
+  } catch (err) {
+    alert("Cannot Logout");
+    console.log("Unable to Logout, Cause: ", err);
+  }
 };

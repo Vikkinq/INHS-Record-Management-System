@@ -6,6 +6,7 @@ import { NavBar } from "@/app/layouts/Navbar";
 import { RightBar } from "@/app/layouts/Rightbar";
 import FileUploadModal from "@/components/homepage/AddRecordModal";
 import UpdateRecordModal from "@/components/homepage/UpdateRecordModal";
+import LoadingSpinner from "@/app/layouts/LoadingSpinner";
 
 import { useAuth } from "../../context/AuthContext";
 import type { FileRecord } from "@/types/Files";
@@ -14,16 +15,21 @@ import { getFiles, deleteFile } from "@/services/file.services";
 export default function MainPage() {
   const [showModal, setShowModal] = useState(false);
   const [files, setFiles] = useState<FileRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [filesLoading, setFilesLoading] = useState(true);
+
   const [selectedFile, setSelectedFile] = useState<FileRecord | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [signupModal, setSignupModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [fileToUpdate, setFileToUpdate] = useState<FileRecord | null>(null);
 
   const [sidebarOpen, setSidebarOpen] = useState(false); // <-- new
+
+  if (authLoading) {
+    return <LoadingSpinner label="Checking authentication..." />;
+  }
 
   const handleOpenUpdateModal = (file: FileRecord) => {
     setFileToUpdate(file);
@@ -56,9 +62,10 @@ export default function MainPage() {
   };
 
   const fetchFiles = async () => {
+    setFilesLoading(true);
     const data = await getFiles();
     setFiles(data);
-    setLoading(false);
+    setFilesLoading(false);
   };
 
   useEffect(() => {
@@ -70,9 +77,18 @@ export default function MainPage() {
     }
   }, [user]);
 
+  if (filesLoading) {
+    return (
+      <div className="absolute inset-0 z-20">
+        <LoadingSpinner label="Loading employee records..." />
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       {/* Sidebar */}
+
       <Sidebar
         onClick={() => setShowModal(true)}
         role={user?.role}
@@ -85,7 +101,7 @@ export default function MainPage() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <NavBar onBurgerClick={() => setSidebarOpen(true)} /> {/* Pass burger toggle */}
+        <NavBar userData={user} onBurgerClick={() => setSidebarOpen(true)} onCreateUser={() => setSignupModal(true)} />
         {showModal && user && (
           <FileUploadModal onClose={() => setShowModal(false)} user={user} onUploaded={handleFileUploaded} />
         )}

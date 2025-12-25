@@ -23,8 +23,12 @@ export default function Sidebar({ onClick, role = "staff", isOpen = false, onClo
         {/* Header */}
         <div className="p-4 border-b border-sidebar-border flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <HardDrive className="w-6 h-6 text-primary-foreground" />
+            <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
+              <img
+                src="https://live.staticflickr.com/5065/5732629600_f6f22b9816_n.jpg"
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="text-xl font-semibold text-foreground">INHS</span>
           </div>

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { updateFile } from "@/services/file.services";
 import type { FileRecord } from "@/types/Files";
 
+import LoadingSpinner from "@/app/layouts/LoadingSpinner";
+
 interface UpdateRecordModalProps {
   file: FileRecord; // Existing file to update
   onClose: () => void;
@@ -12,6 +14,8 @@ export default function UpdateRecordModal({ file, onClose, onUpdate }: UpdateRec
   const [fileName, setFileName] = useState(file.fileName || "");
   const [category, setCategory] = useState(file.category || "");
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     setFileName(file.fileName || "");
     setCategory(file.category || "");
@@ -19,6 +23,7 @@ export default function UpdateRecordModal({ file, onClose, onUpdate }: UpdateRec
 
   const handleUpdate = async () => {
     try {
+      setLoading(true);
       const updatedData: Partial<FileRecord> = { fileName, category };
 
       await updateFile(file.fileId, updatedData);
@@ -26,6 +31,7 @@ export default function UpdateRecordModal({ file, onClose, onUpdate }: UpdateRec
       // Update parent state
       onUpdate({ ...file, ...updatedData });
 
+      setLoading(false);
       onClose();
     } catch (err) {
       console.error("Error updating file:", err);
@@ -34,6 +40,8 @@ export default function UpdateRecordModal({ file, onClose, onUpdate }: UpdateRec
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      {loading && <LoadingSpinner label="Updating file..." />}
+
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md sm:max-w-lg">
         {/* Header */}
         <div className="mb-4">

@@ -42,6 +42,17 @@ export default function LoginForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+        {/* Logo */}
+        <div className="flex justify-center mb-4">
+          <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100">
+            <img
+              src="https://live.staticflickr.com/5065/5732629600_f6f22b9816_n.jpg"
+              alt="School Logo"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-slate-800">School Records Portal</h1>

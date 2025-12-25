@@ -123,7 +123,6 @@ export default function MainContent({ files, selectedFile, onFileClick }: MainCo
       <div className="flex-1 overflow-y-auto p-6">
         <div className="border rounded-lg overflow-x-auto bg-white">
           <table className="w-full min-w-150">
-            {" "}
             {/* ensures horizontal scroll if needed */}
             <thead className="bg-muted/50 border-b">
               <tr>

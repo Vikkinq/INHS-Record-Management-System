@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { uploadFile } from "../../services/file.services";
 import { getFileType } from "../../utils/file.utils";
 import type { FileRecord } from "@/types/Files";
+import LoadingSpinner from "@/app/layouts/LoadingSpinner";
 
 import { isValidFileType } from "../../utils/file.utils";
 
@@ -15,6 +16,8 @@ export default function FileUploadModal({ onClose, user, onUploaded }: FileUploa
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [category, setCategory] = useState<string>(""); // default can be empty or "Other"
 
+  const [loading, setLoading] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFilesAdded = (files: FileList) => {
@@ -27,6 +30,7 @@ export default function FileUploadModal({ onClose, user, onUploaded }: FileUploa
 
   const handleUpload = async () => {
     if (!user) return;
+    setLoading(true);
     const uploaded: FileRecord[] = [];
     for (const file of selectedFiles) {
       try {
@@ -49,6 +53,7 @@ export default function FileUploadModal({ onClose, user, onUploaded }: FileUploa
       }
     }
 
+    setLoading(false);
     onUploaded(uploaded);
     setSelectedFiles([]);
     onClose();
@@ -56,8 +61,11 @@ export default function FileUploadModal({ onClose, user, onUploaded }: FileUploa
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      {loading && <LoadingSpinner label="Uploading file..." />}
+
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md sm:max-w-lg">
         {/* Header */}
+
         <div className="mb-4">
           <h2 className="text-xl font-semibold text-slate-800">Upload Files</h2>
           <p className="text-sm text-slate-500 mt-1">Drag & drop files or browse from your device</p>
