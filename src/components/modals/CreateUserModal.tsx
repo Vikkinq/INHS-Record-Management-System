@@ -25,24 +25,20 @@ export default function CreateUserModal({ isOpen, onClose }: CreateUserModalProp
     setLoading(true);
 
     try {
-      // 1. Create user in Firebase Auth
       const firebaseUser = await registerWithEmail(email, password);
 
-      // 2. Prepare Firestore data
       const input: CreateUserProfileInput = {
-        uid: firebaseUser.uid, // automatically generated
-        email: firebaseUser.email!, // guaranteed to exist after registration
+        uid: firebaseUser.uid,
+        email: firebaseUser.email!,
         provider: "email",
-        role, // from your dropdown
-        fullName, // include full name if you want
+        role,
+        fullName,
       };
 
-      // 3. Create Firestore document
       await createUserProfile(input);
 
       addToast(`Successfully created ${email} as ${role}`, "success");
 
-      // 4. Reset form
       setFullName("");
       setEmail("");
       setPassword("");

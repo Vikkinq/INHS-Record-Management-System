@@ -1,15 +1,19 @@
 import { logout } from "../../services/auth.services";
 import { Upload, File, Users, Clock, Settings, HelpCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 type SidebarProps = {
   onClick?: () => void;
   role?: "admin" | "staff";
   isOpen?: boolean; // for mobile toggle
   onClose?: () => void; // close sidebar on mobile
+  onHelpModal?: () => void;
 };
 
-export default function Sidebar({ onClick, isOpen = false, onClose }: SidebarProps) {
+export default function Sidebar({ onClick, isOpen = false, onClose, onHelpModal }: SidebarProps) {
+  const { user } = useAuth();
+
   return (
     <>
       <aside
@@ -54,11 +58,11 @@ export default function Sidebar({ onClick, isOpen = false, onClose }: SidebarPro
           <div className="space-y-1">
             <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
               <Users className="w-5 h-5" />
-              <span className="text-sm font-medium">All Drives</span>
+              <span className="text-sm font-medium">All Records</span>
             </button>
             <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
               <File className="w-5 h-5" />
-              <span className="text-sm font-medium">My Drive</span>
+              <span className="text-sm font-medium">My Records</span>
             </button>
             <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
               <Clock className="w-5 h-5" />
@@ -69,11 +73,16 @@ export default function Sidebar({ onClick, isOpen = false, onClose }: SidebarPro
           <div className="border-t border-sidebar-border my-3" />
 
           <div className="space-y-1">
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
-              <Settings className="w-5 h-5" />
-              <span className="text-sm font-medium">Settings</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
+            {user?.role === "admin" ? (
+              <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
+                <Settings className="w-5 h-5" />
+                <span className="text-sm font-medium">Employee</span>
+              </button>
+            ) : null}
+            <button
+              onClick={onHelpModal}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
+            >
               <HelpCircle className="w-5 h-5" />
               <span className="text-sm font-medium">Help</span>
             </button>

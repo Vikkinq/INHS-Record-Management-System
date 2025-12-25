@@ -18,14 +18,10 @@ export default function LoginForm() {
     setError(null);
 
     try {
-      const user = await loginWithEmail(email, password);
-
-      // ensure Firestore profile exists (important for role-based access)
-      if (!user.email) {
-        throw new Error("No email associated with this account");
-      }
-
+      await loginWithEmail(email, password);
       addToast("Welcome Back!", "success");
+
+      // ❌ REMOVE THIS
       navigate("/");
     } catch (err: any) {
       setError(err.message || "Invalid credentials");

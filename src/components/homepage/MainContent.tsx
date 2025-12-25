@@ -73,7 +73,7 @@ export default function MainContent({ files, selectedFile, onFileClick }: MainCo
       {/* Toolbar */}
       <div className="sticky top-0 z-10 bg-white border-b px-4 md:px-6 py-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3 md:gap-0">
-          <h1 className="text-xl font-bold text-slate-800">Employee Records ({filteredData.length} Files)</h1>
+          <h1 className="text-xl font-bold text-slate-800">School Records ({filteredData.length} Files)</h1>
 
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mt-2 md:mt-0">
             <input
