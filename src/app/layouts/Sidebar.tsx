@@ -1,5 +1,5 @@
 import { logout } from "../../services/auth.services";
-import { Upload, File, Users, Clock, Settings, HelpCircle, HardDrive, LogOut } from "lucide-react";
+import { Upload, File, Users, Clock, Settings, HelpCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type SidebarProps = {
@@ -9,7 +9,7 @@ type SidebarProps = {
   onClose?: () => void; // close sidebar on mobile
 };
 
-export default function Sidebar({ onClick, role = "staff", isOpen = false, onClose }: SidebarProps) {
+export default function Sidebar({ onClick, isOpen = false, onClose }: SidebarProps) {
   return (
     <>
       <aside
