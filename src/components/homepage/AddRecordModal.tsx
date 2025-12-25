@@ -3,6 +3,7 @@ import { uploadFile } from "../../services/file.services";
 import { getFileType } from "../../utils/file.utils";
 import type { FileRecord } from "@/types/Files";
 import LoadingSpinner from "@/components/general/LoadingSpinner";
+import { useToast } from "../general/Toast";
 
 import { isValidFileType } from "../../utils/file.utils";
 
@@ -13,6 +14,8 @@ interface FileUploadModalProps {
 }
 
 export default function FileUploadModal({ onClose, user, onUploaded }: FileUploadModalProps) {
+  const { addToast } = useToast();
+
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [category, setCategory] = useState<string>(""); // default can be empty or "Other"
 
@@ -48,6 +51,7 @@ export default function FileUploadModal({ onClose, user, onUploaded }: FileUploa
         });
 
         uploaded.push(newFile);
+        addToast("Record Successfully Added!", "success");
       } catch (err) {
         console.error(err);
       }

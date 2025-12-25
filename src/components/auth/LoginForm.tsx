@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { loginWithEmail } from "../../services/auth.services";
-import { createUserProfile } from "../../services/user.services";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../general/Toast";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,14 +25,8 @@ export default function LoginForm() {
         throw new Error("No email associated with this account");
       }
 
-      await createUserProfile({
-        uid: user.uid,
-        email: user.email,
-      });
-
+      addToast("Welcome Back!", "success");
       navigate("/");
-
-      // redirect handled by AuthContext / ProtectedRoute
     } catch (err: any) {
       setError(err.message || "Invalid credentials");
     } finally {

@@ -9,7 +9,8 @@ export const createUserProfile = async (input: CreateUserProfileInput) => {
   if (!snap.exists()) {
     await setDoc(userRef, {
       email: input.email,
-      role: "staff",
+      role: input.role,
+      fullName: input.fullName,
       provider: input.provider ?? "email",
       createdAt: serverTimestamp(),
     });

@@ -31,7 +31,7 @@ export function NavBar({ onBurgerClick, onCreateUser, userData }: NavBarProps) {
       <div className="flex items-center gap-2">
         {/* Create Account Button */}
         {userData?.role === "admin" ? (
-          <Button variant="outline" onClick={() => console.log(userData)} className="flex items-center gap-1">
+          <Button variant="outline" onClick={onCreateUser} className="flex items-center gap-1">
             <Plus className="w-4 h-4" />
             <span>Create Account</span>
           </Button>

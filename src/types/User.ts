@@ -13,5 +13,7 @@ export interface UserProfile {
 export type CreateUserProfileInput = {
   uid: string;
   email: string;
+  role: UserRole;
+  fullName: string;
   provider?: AuthProvider;
 };

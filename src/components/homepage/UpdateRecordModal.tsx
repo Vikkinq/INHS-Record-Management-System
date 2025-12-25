@@ -3,6 +3,7 @@ import { updateFile } from "@/services/file.services";
 import type { FileRecord } from "@/types/Files";
 
 import LoadingSpinner from "@/components/general/LoadingSpinner";
+import { useToast } from "../general/Toast";
 
 interface UpdateRecordModalProps {
   file: FileRecord; // Existing file to update
@@ -11,6 +12,8 @@ interface UpdateRecordModalProps {
 }
 
 export default function UpdateRecordModal({ file, onClose, onUpdate }: UpdateRecordModalProps) {
+  const { addToast } = useToast();
+
   const [fileName, setFileName] = useState(file.fileName || "");
   const [category, setCategory] = useState(file.category || "");
 
@@ -32,6 +35,7 @@ export default function UpdateRecordModal({ file, onClose, onUpdate }: UpdateRec
       onUpdate({ ...file, ...updatedData });
 
       setLoading(false);
+      addToast("Record Updated!", "success");
       onClose();
     } catch (err) {
       console.error("Error updating file:", err);

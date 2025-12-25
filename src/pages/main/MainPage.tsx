@@ -6,13 +6,18 @@ import { NavBar } from "@/app/layouts/Navbar";
 import { RightBar } from "@/app/layouts/Rightbar";
 import FileUploadModal from "@/components/homepage/AddRecordModal";
 import UpdateRecordModal from "@/components/homepage/UpdateRecordModal";
+import CreateUserModal from "@/components/auth/CreateUserModal";
+
 import LoadingSpinner from "@/components/general/LoadingSpinner";
+import { useToast } from "@/components/general/Toast";
 
 import { useAuth } from "../../context/AuthContext";
 import type { FileRecord } from "@/types/Files";
 import { getFiles, deleteFile } from "@/services/file.services";
 
 export default function MainPage() {
+  const { addToast } = useToast();
+
   const [showModal, setShowModal] = useState(false);
   const [files, setFiles] = useState<FileRecord[]>([]);
   const [filesLoading, setFilesLoading] = useState(true);
@@ -21,7 +26,7 @@ export default function MainPage() {
   const [showDetails, setShowDetails] = useState(false);
   const { user, loading: authLoading } = useAuth();
 
-  const [signupModal, setSignupModal] = useState(false);
+  const [createUser, setCreateUser] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [fileToUpdate, setFileToUpdate] = useState<FileRecord | null>(null);
 
@@ -56,6 +61,7 @@ export default function MainPage() {
       await deleteFile(file); // deletes from Storage + Firestore
 
       setFiles((prev) => prev.filter((f) => f.fileId !== file.fileId));
+      addToast("Record Deleted!", "error");
     } catch (err) {
       console.error("Cannot delete file:", err);
     }
@@ -73,13 +79,13 @@ export default function MainPage() {
       console.log("Logged in User: ", user);
       fetchFiles();
     } catch (err) {
-      console.error("Error Spotted", err);
+      addToast(`Error: ${err}`, "error");
     }
   }, [user]);
 
   if (filesLoading) {
     return (
-      <div className="absolute inset-0 z-20">
+      <div className="absolute inset-0 z-20 animate-fadeIn">
         <LoadingSpinner label="Loading employee records..." />
       </div>
     );
@@ -101,7 +107,7 @@ export default function MainPage() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <NavBar userData={user} onBurgerClick={() => setSidebarOpen(true)} onCreateUser={() => setSignupModal(true)} />
+        <NavBar userData={user} onBurgerClick={() => setSidebarOpen(true)} onCreateUser={() => setCreateUser(true)} />
         {showModal && user && (
           <FileUploadModal onClose={() => setShowModal(false)} user={user} onUploaded={handleFileUploaded} />
         )}
@@ -126,6 +132,8 @@ export default function MainPage() {
               onUpdate={handleUpdateFile}
             />
           )}
+
+          {createUser && <CreateUserModal onClose={() => setCreateUser(false)} isOpen={true} />}
         </div>
       </div>
     </div>

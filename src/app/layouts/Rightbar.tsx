@@ -14,6 +14,7 @@ type RightBarProps = {
 
 export function RightBar({ selectedFile, onClose, onDeleteFile, onUpdateClick }: RightBarProps) {
   const { user } = useAuth();
+
   if (!selectedFile) return null;
   const canEdit = user && canEditFile(selectedFile, user);
 

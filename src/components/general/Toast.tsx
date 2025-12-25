@@ -36,7 +36,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`flex items-center justify-between p-3 rounded-lg shadow-md min-w-[220px] max-w-xs text-sm font-medium ${
+            className={`flex items-center justify-between p-3 rounded-lg shadow-md min-w-55 max-w-xs text-sm font-medium ${
               toast.type === "success"
                 ? "bg-green-100 text-green-800"
                 : toast.type === "error"
