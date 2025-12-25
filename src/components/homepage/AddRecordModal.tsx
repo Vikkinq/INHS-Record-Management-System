@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { uploadFile } from "../../services/file.services";
 import { getFileType } from "../../utils/file.utils";
 import type { FileRecord } from "@/types/Files";
-import LoadingSpinner from "@/app/layouts/LoadingSpinner";
+import LoadingSpinner from "@/components/general/LoadingSpinner";
 
 import { isValidFileType } from "../../utils/file.utils";
 

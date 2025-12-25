@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { updateFile } from "@/services/file.services";
 import type { FileRecord } from "@/types/Files";
 
-import LoadingSpinner from "@/app/layouts/LoadingSpinner";
+import LoadingSpinner from "@/components/general/LoadingSpinner";
 
 interface UpdateRecordModalProps {
   file: FileRecord; // Existing file to update

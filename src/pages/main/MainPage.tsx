@@ -6,7 +6,7 @@ import { NavBar } from "@/app/layouts/Navbar";
 import { RightBar } from "@/app/layouts/Rightbar";
 import FileUploadModal from "@/components/homepage/AddRecordModal";
 import UpdateRecordModal from "@/components/homepage/UpdateRecordModal";
-import LoadingSpinner from "@/app/layouts/LoadingSpinner";
+import LoadingSpinner from "@/components/general/LoadingSpinner";
 
 import { useAuth } from "../../context/AuthContext";
 import type { FileRecord } from "@/types/Files";
