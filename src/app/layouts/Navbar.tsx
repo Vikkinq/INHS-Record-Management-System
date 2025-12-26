@@ -21,7 +21,7 @@ export function NavBar({ onBurgerClick, onCreateUser, userData }: NavBarProps) {
 
       {/* Brand / Optional Logo */}
       <div className="hidden md:flex items-center gap-2">
-        <span className="text-xl font-bold text-slate-800">Ivisan National Highschool Portal</span>
+        <span className="text-xl font-bold text-slate-800">Welcome Back, {userData?.email}</span>
       </div>
 
       {/* Spacer */}
