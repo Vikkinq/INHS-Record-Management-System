@@ -32,6 +32,8 @@ export default function MainPage() {
 
   // Sidebar
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [recordFilter, setRecordFilter] = useState<"all" | "mine" | "recent">("all");
+  const [allFiles, setAllFiles] = useState<FileRecord[]>([]);
 
   // Single modal state
   const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -41,6 +43,7 @@ export default function MainPage() {
     setFilesLoading(true);
     try {
       const data = await getFiles();
+      setAllFiles(data);
       setFiles(data);
     } catch (err) {
       addToast(`Error fetching files: ${err}`, "error");
@@ -80,6 +83,13 @@ export default function MainPage() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (user) {
+      if (recordFilter === "all") setFiles(allFiles);
+      if (recordFilter === "mine") setFiles(allFiles.filter((f) => f.uploadedBy === user?.email));
+    }
+  }, [recordFilter, allFiles, user]);
+
   if (authLoading || filesLoading) {
     return (
       <div className="absolute inset-0 z-20 flex items-center justify-center animate-fadeIn">
@@ -97,6 +107,7 @@ export default function MainPage() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onHelpModal={() => setActiveModal("help")}
+        setRecordFilter={setRecordFilter}
       />
 
       {/* Mobile overlay */}

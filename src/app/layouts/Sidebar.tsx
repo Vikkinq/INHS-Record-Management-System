@@ -1,5 +1,5 @@
 import { logout } from "../../services/auth.services";
-import { Upload, File, Users, Clock, Settings, HelpCircle, LogOut } from "lucide-react";
+import { Upload, File, Users, Settings, HelpCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 
@@ -9,9 +9,10 @@ type SidebarProps = {
   isOpen?: boolean; // for mobile toggle
   onClose?: () => void; // close sidebar on mobile
   onHelpModal?: () => void;
+  setRecordFilter?: (value: "all" | "mine" | "recent") => void;
 };
 
-export default function Sidebar({ onClick, isOpen = false, onClose, onHelpModal }: SidebarProps) {
+export default function Sidebar({ onClick, isOpen = false, onClose, onHelpModal, setRecordFilter }: SidebarProps) {
   const { user } = useAuth();
 
   return (
@@ -56,17 +57,19 @@ export default function Sidebar({ onClick, isOpen = false, onClose, onHelpModal 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3">
           <div className="space-y-1">
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
+            <button
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
+              onClick={() => setRecordFilter?.("all")}
+            >
               <Users className="w-5 h-5" />
               <span className="text-sm font-medium">All Records</span>
             </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
+            <button
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
+              onClick={() => setRecordFilter?.("mine")}
+            >
               <File className="w-5 h-5" />
               <span className="text-sm font-medium">My Records</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
-              <Clock className="w-5 h-5" />
-              <span className="text-sm font-medium">Recent</span>
             </button>
           </div>
 
