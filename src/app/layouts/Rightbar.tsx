@@ -54,6 +54,10 @@ export function RightBar({ selectedFile, onClose, onDeleteFile, onUpdateClick }:
 
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Category</span>
+                <span className="font-medium capitalize">{selectedFile.category}</span>
+              </div>
+              <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Type</span>
                 <span className="font-medium capitalize">{selectedFile.fileType}</span>
               </div>
@@ -66,7 +70,7 @@ export function RightBar({ selectedFile, onClose, onDeleteFile, onUpdateClick }:
                 <span className="font-medium">{selectedFile.uploadedBy}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Modified</span>
+                <span className="text-gray-500">Uploaded</span>
                 <span className="font-medium">{formatDate(selectedFile.uploadedAt)}</span>
               </div>
             </div>

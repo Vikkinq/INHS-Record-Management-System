@@ -128,7 +128,7 @@ export default function MainContent({ files, selectedFile, onFileClick }: MainCo
               <tr>
                 <th className="px-4 py-3 text-left">Name</th>
                 <th className="px-4 py-3 text-left">Owner</th>
-                <th className="px-4 py-3 text-left">Modified</th>
+                <th className="px-4 py-3 text-left">Uploaded</th>
                 <th className="px-4 py-3 text-left">Category</th>
                 <th className="px-4 py-3 text-left">Type</th>
                 <th className="px-4 py-3 text-left">Size</th>
