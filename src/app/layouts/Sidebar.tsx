@@ -10,9 +10,19 @@ type SidebarProps = {
   onClose?: () => void; // close sidebar on mobile
   onHelpModal?: () => void;
   setRecordFilter?: (value: "all" | "mine" | "recent") => void;
+  activeView: "files" | "employees";
+  onToggleView: () => void;
 };
 
-export default function Sidebar({ onClick, isOpen = false, onClose, onHelpModal, setRecordFilter }: SidebarProps) {
+export default function Sidebar({
+  onClick,
+  isOpen = false,
+  onClose,
+  onHelpModal,
+  setRecordFilter,
+  activeView,
+  onToggleView,
+}: SidebarProps) {
   const { user } = useAuth();
 
   return (
@@ -76,12 +86,18 @@ export default function Sidebar({ onClick, isOpen = false, onClose, onHelpModal,
           <div className="border-t border-sidebar-border my-3" />
 
           <div className="space-y-1">
-            {user?.role === "admin" ? (
-              <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
+            {user?.role === "admin" && (
+              <button
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors
+                ${activeView === "employees" ? "bg-sidebar-accent font-semibold" : "hover:bg-sidebar-accent"}
+                `}
+                onClick={onToggleView}
+              >
                 <Settings className="w-5 h-5" />
-                <span className="text-sm font-medium">Employee</span>
+                <span className="text-sm font-medium">{activeView === "files" ? "Employees" : "Files"}</span>
               </button>
-            ) : null}
+            )}
+
             <button
               onClick={onHelpModal}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"

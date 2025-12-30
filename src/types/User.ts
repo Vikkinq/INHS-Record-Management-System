@@ -5,6 +5,7 @@ export interface UserProfile {
   uid: string;
   email: string;
   role: UserRole;
+  fullName: string;
   provider: AuthProvider;
   createdAt: any;
 }

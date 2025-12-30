@@ -1,6 +1,6 @@
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs } from "firebase/firestore";
 import { db } from "../config/firebase";
-import type { CreateUserProfileInput } from "../types/User";
+import type { CreateUserProfileInput, UserProfile } from "../types/User";
 
 export const createUserProfile = async (input: CreateUserProfileInput) => {
   const userRef = doc(db, "users", input.uid);
@@ -16,3 +16,17 @@ export const createUserProfile = async (input: CreateUserProfileInput) => {
     });
   }
 };
+
+export async function getAllUsers(): Promise<UserProfile[]> {
+  const usersRef = collection(db, "users");
+  const snapshot = await getDocs(usersRef);
+
+  const users: UserProfile[] = snapshot.docs.map((doc) => {
+    return {
+      uid: doc.id,
+      ...(doc.data() as Omit<UserProfile, "uid">),
+    };
+  });
+
+  return users;
+}

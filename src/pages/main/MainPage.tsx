@@ -4,6 +4,7 @@ import MainContent from "../../components/homepage/MainContent";
 import Sidebar from "@/app/layouts/Sidebar";
 import { NavBar } from "@/app/layouts/Navbar";
 import { RightBar } from "@/app/layouts/Rightbar";
+import EmployeeContent from "../admin/EmployeeContent";
 
 import FileUploadModal from "@/components/modals/AddRecordModal";
 import UpdateRecordModal from "@/components/modals/UpdateRecordModal";
@@ -29,6 +30,8 @@ export default function MainPage() {
   const [selectedFile, setSelectedFile] = useState<FileRecord | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [fileToUpdate, setFileToUpdate] = useState<FileRecord | null>(null);
+
+  const [activeView, setActiveView] = useState<"files" | "employees">("files");
 
   // Sidebar
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -77,6 +80,10 @@ export default function MainPage() {
     }
   };
 
+  const toggleView = () => {
+    setActiveView((prev) => (prev === "files" ? "employees" : "files"));
+  };
+
   useEffect(() => {
     if (user) {
       fetchFiles();
@@ -108,6 +115,8 @@ export default function MainPage() {
         onClose={() => setSidebarOpen(false)}
         onHelpModal={() => setActiveModal("help")}
         setRecordFilter={setRecordFilter}
+        activeView={activeView}
+        onToggleView={toggleView}
       />
 
       {/* Mobile overlay */}
@@ -123,7 +132,11 @@ export default function MainPage() {
 
         <div className="flex-1 flex overflow-hidden">
           {/* Main scrollable table */}
-          <MainContent files={files} selectedFile={selectedFile} onFileClick={handleFileClick} />
+          {activeView === "files" && (
+            <MainContent files={files} selectedFile={selectedFile} onFileClick={handleFileClick} />
+          )}
+
+          {activeView === "employees" && user?.role === "admin" && <EmployeeContent />}
 
           {/* Right sidebar */}
           {showDetails && selectedFile && (
