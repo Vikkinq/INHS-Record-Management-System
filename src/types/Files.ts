@@ -1,6 +1,7 @@
 export interface FileRecord {
   fileId: string;
   employeeId: string;
+  userId?: string | null;
   fileName: string;
   fileType: FileType;
   fileSize: number;

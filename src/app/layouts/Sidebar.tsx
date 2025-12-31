@@ -1,5 +1,5 @@
 import { logout } from "../../services/auth.services";
-import { Upload, File, Users, Settings, HelpCircle, LogOut } from "lucide-react";
+import { Upload, File, Users, HelpCircle, LogOut, Files } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 
@@ -10,8 +10,8 @@ type SidebarProps = {
   onClose?: () => void; // close sidebar on mobile
   onHelpModal?: () => void;
   setRecordFilter?: (value: "all" | "mine" | "recent") => void;
+  onToggleView: (value: "files" | "employees") => void;
   activeView: "files" | "employees";
-  onToggleView: () => void;
 };
 
 export default function Sidebar({
@@ -20,8 +20,8 @@ export default function Sidebar({
   onClose,
   onHelpModal,
   setRecordFilter,
-  activeView,
   onToggleView,
+  activeView,
 }: SidebarProps) {
   const { user } = useAuth();
 
@@ -68,35 +68,40 @@ export default function Sidebar({
         <nav className="flex-1 overflow-y-auto px-3">
           <div className="space-y-1">
             <button
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
-              onClick={() => setRecordFilter?.("all")}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
+              onClick={() => onToggleView("employees")}
             >
               <Users className="w-5 h-5" />
-              <span className="text-sm font-medium">All Records</span>
+              <span className="text-sm font-medium">Employees</span>
             </button>
             <button
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
-              onClick={() => setRecordFilter?.("mine")}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
+              onClick={() => onToggleView("files")}
             >
-              <File className="w-5 h-5" />
-              <span className="text-sm font-medium">My Records</span>
+              <Files className="w-5 h-5" />
+              <span className="text-sm font-medium">Files</span>
             </button>
           </div>
 
           <div className="border-t border-sidebar-border my-3" />
 
           <div className="space-y-1">
-            {user?.role === "admin" && (
+            <button
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
+              onClick={() => setRecordFilter?.("all")}
+            >
+              <Users className="w-5 h-5" />
+              <span className="text-sm font-medium">All Records</span>
+            </button>
+            {activeView === "files" ? (
               <button
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors
-                ${activeView === "employees" ? "bg-sidebar-accent font-semibold" : "hover:bg-sidebar-accent"}
-                `}
-                onClick={onToggleView}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
+                onClick={() => setRecordFilter?.("mine")}
               >
-                <Settings className="w-5 h-5" />
-                <span className="text-sm font-medium">{activeView === "files" ? "Employees" : "Files"}</span>
+                <File className="w-5 h-5" />
+                <span className="text-sm font-medium">My Records</span>
               </button>
-            )}
+            ) : null}
 
             <button
               onClick={onHelpModal}

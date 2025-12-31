@@ -81,9 +81,9 @@ export default function MainPage() {
     }
   };
 
-  const toggleView = () => {
-    setActiveView((prev) => (prev === "files" ? "employees" : "files"));
-  };
+  // const toggleView = () => {
+  //   setActiveView((prev) => (prev === "files" ? "employees" : "files"));
+  // };
 
   useEffect(() => {
     if (user) {
@@ -116,8 +116,8 @@ export default function MainPage() {
         onClose={() => setSidebarOpen(false)}
         onHelpModal={() => setActiveModal("help")}
         setRecordFilter={setRecordFilter}
+        onToggleView={setActiveView}
         activeView={activeView}
-        onToggleView={toggleView}
       />
 
       {/* Mobile overlay */}
@@ -138,7 +138,7 @@ export default function MainPage() {
             <MainContent files={files} selectedFile={selectedFile} onFileClick={handleFileClick} />
           )}
 
-          {activeView === "employees" && user?.role === "admin" && <EmployeeContent />}
+          {activeView === "employees" && <EmployeeContent />}
 
           {/* Right sidebar */}
           {showDetails && selectedFile && (

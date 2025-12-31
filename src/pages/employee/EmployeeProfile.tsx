@@ -8,6 +8,8 @@ import type { Employee } from "@/types/Employee";
 import { getEmployeeById } from "@/services/employee.services";
 import { getFilesByEmployeeId } from "@/services/employee.services";
 
+import LoadingSpinner from "@/components/general/LoadingSpinner";
+
 export default function EmployeeProfilePage() {
   const navigate = useNavigate();
   const { employeeId } = useParams(); // /employee/:employeeId
@@ -20,13 +22,13 @@ export default function EmployeeProfilePage() {
   useEffect(() => {
     if (!employeeId) return;
 
-    const fetchEmployee = async () => {
+    const fetchEmployeeData = async () => {
       try {
         setLoading(true);
-        const data = await getEmployeeById(employeeId);
-        setEmployee(data);
+        const emp = await getEmployeeById(employeeId);
+        setEmployee(emp);
 
-        // Optional: fetch number of files for this employee
+        // Fetch all files using employeeId
         const files = await getFilesByEmployeeId(employeeId);
         setFileCount(files.length);
       } catch (err) {
@@ -37,10 +39,10 @@ export default function EmployeeProfilePage() {
       }
     };
 
-    fetchEmployee();
+    fetchEmployeeData();
   }, [employeeId]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (loading) return <LoadingSpinner label="Loading Employee Datas" />;
   if (error || !employee)
     return <div className="min-h-screen flex items-center justify-center">{error || "Employee not found"}</div>;
 
@@ -91,7 +93,7 @@ export default function EmployeeProfilePage() {
         </div>
 
         {/* Personal Information */}
-        <div className="border border-border rounded-lg bg-background p-6">
+        <div className="border-2 border-border rounded-lg bg-background p-6">
           <div className="flex items-center gap-3 mb-6">
             <User className="w-5 h-5 text-blue-700 " />
             <h2 className="text-lg font-semibold text-foreground">Personal Information</h2>
@@ -105,7 +107,7 @@ export default function EmployeeProfilePage() {
         </div>
 
         {/* Position / Employment Details */}
-        <div className="border border-border rounded-lg bg-background p-6">
+        <div className="border-2 border-border rounded-lg bg-background p-6">
           <div className="flex items-center gap-3 mb-6">
             <Briefcase className="w-5 h-5 text-blue-700" />
             <h2 className="text-lg font-semibold text-foreground">Position / Employment Details</h2>
@@ -121,7 +123,7 @@ export default function EmployeeProfilePage() {
         </div>
 
         {/* Appointment Dates */}
-        <div className="border border-border rounded-lg bg-background p-6">
+        <div className="border-2 border-border rounded-lg bg-background p-6">
           <div className="flex items-center gap-3 mb-6">
             <Calendar className="w-5 h-5 text-blue-700" />
             <h2 className="text-lg font-semibold text-foreground">Appointment Dates</h2>
@@ -133,7 +135,7 @@ export default function EmployeeProfilePage() {
         </div>
 
         {/* Educational Background */}
-        <div className="border border-border rounded-lg bg-background p-6">
+        <div className="border-2 border-border rounded-lg bg-background p-6">
           <div className="flex items-center gap-3 mb-6">
             <GraduationCap className="w-5 h-5 text-blue-700" />
             <h2 className="text-lg font-semibold text-foreground">Educational Background</h2>
@@ -147,7 +149,7 @@ export default function EmployeeProfilePage() {
         </div>
 
         {/* System Info */}
-        <div className="border border-border rounded-lg bg-background p-6">
+        <div className="border-2 border-border rounded-lg bg-background p-6">
           <div className="flex items-center gap-3 mb-6">
             <Info className="w-5 h-5 text-blue-700" />
             <h2 className="text-lg font-semibold text-foreground">System Information</h2>

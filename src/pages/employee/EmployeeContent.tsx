@@ -94,7 +94,7 @@ export default function EmployeeContent() {
               placeholder="Search name..."
               value={search}
               onChange={(e) => handleFilterChange(setSearch)(e.target.value)}
-              className="w-full md:w-128 rounded-lg border px-3 py-2 text-sm"
+              className="w-full md:w-lg rounded-lg border px-3 py-2 text-sm"
             />
 
             <select
