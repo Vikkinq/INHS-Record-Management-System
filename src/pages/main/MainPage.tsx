@@ -4,12 +4,13 @@ import MainContent from "../../components/homepage/MainContent";
 import Sidebar from "@/app/layouts/Sidebar";
 import { NavBar } from "@/app/layouts/Navbar";
 import { RightBar } from "@/app/layouts/Rightbar";
-import EmployeeContent from "../admin/EmployeeContent";
+import EmployeeContent from "../employee/EmployeeContent";
 
 import FileUploadModal from "@/components/modals/AddRecordModal";
 import UpdateRecordModal from "@/components/modals/UpdateRecordModal";
 import CreateUserModal from "@/components/modals/CreateUserModal";
 import HelpModal from "@/components/modals/HelpModal";
+import CreateEmployeeModal from "@/components/modals/CreateEmployeeModal";
 
 import LoadingSpinner from "@/components/general/LoadingSpinner";
 import { useToast } from "@/components/general/Toast";
@@ -18,7 +19,7 @@ import { useAuth } from "../../context/AuthContext";
 import type { FileRecord } from "@/types/Files";
 import { getFiles, deleteFile } from "@/services/file.services";
 
-type ModalType = "addRecord" | "updateRecord" | "createUser" | "help" | null;
+type ModalType = "addRecord" | "updateRecord" | "createUser" | "help" | "createEmployee" | null;
 
 export default function MainPage() {
   const { addToast } = useToast();
@@ -31,7 +32,7 @@ export default function MainPage() {
   const [showDetails, setShowDetails] = useState(false);
   const [fileToUpdate, setFileToUpdate] = useState<FileRecord | null>(null);
 
-  const [activeView, setActiveView] = useState<"files" | "employees">("files");
+  const [activeView, setActiveView] = useState<"files" | "employees">("employees");
 
   // Sidebar
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -128,6 +129,7 @@ export default function MainPage() {
           userData={user}
           onBurgerClick={() => setSidebarOpen(true)}
           onCreateUser={() => setActiveModal("createUser")}
+          onCreateEmployee={() => setActiveModal("createEmployee")}
         />
 
         <div className="flex-1 flex overflow-hidden">
@@ -163,6 +165,10 @@ export default function MainPage() {
           {activeModal === "createUser" && <CreateUserModal onClose={() => setActiveModal(null)} isOpen={true} />}
 
           {activeModal === "help" && <HelpModal onClose={() => setActiveModal(null)} />}
+
+          {activeModal === "createEmployee" && (
+            <CreateEmployeeModal onClose={() => setActiveModal(null)} isOpen={true} />
+          )}
         </div>
       </div>
     </div>

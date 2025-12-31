@@ -7,9 +7,10 @@ type NavBarProps = {
   onBurgerClick?: () => void; // mobile sidebar toggle
   onCreateUser?: () => void; // create user callback
   userData: UserProfile | null;
+  onCreateEmployee?: () => void;
 };
 
-export function NavBar({ onBurgerClick, onCreateUser, userData }: NavBarProps) {
+export function NavBar({ onBurgerClick, onCreateUser, userData, onCreateEmployee }: NavBarProps) {
   return (
     <header className="h-16 border-b border-border bg-background flex items-center px-4 md:px-6">
       {/* Mobile Burger */}
@@ -36,6 +37,11 @@ export function NavBar({ onBurgerClick, onCreateUser, userData }: NavBarProps) {
             <span>Create Account</span>
           </Button>
         ) : null}
+
+        <Button variant="outline" onClick={onCreateEmployee} className="flex items-center gap-1">
+          <Plus className="w-4 h-4" />
+          <span>Create Employee</span>
+        </Button>
 
         {/* Avatar */}
         <Avatar className="w-9 h-9 cursor-pointer border-2 border-border">

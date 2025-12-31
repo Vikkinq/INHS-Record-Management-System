@@ -1,93 +1,84 @@
 import { useState, useEffect, useMemo } from "react";
-import { getAllUsers } from "@/services/user.services";
-import type { UserProfile } from "@/types/User";
+import { useNavigate } from "react-router-dom";
+import { getEmployees } from "@/services/employee.services";
+import type { Employee } from "@/types/Employee";
 import EmployeeTable from "./EmployeeTable";
 
 const PAGE_SIZE = 30;
 
-function getTimestamp(ts: any) {
-  if (!ts) return 0;
-  return ts.toDate ? ts.toDate().getTime() : new Date(ts).getTime();
-}
-
 export default function EmployeeContent() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState(""); // role filter
-  const [sortBy, setSortBy] = useState<"role" | "fullName" | "createdAt">("role");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [category, setCategory] = useState("");
+  const [sortBy, setSortBy] = useState<"fullName" | "sex" | "employmentStatus" | "createdAt">("fullName");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [page, setPage] = useState(1);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
-  const [userData, setUserData] = useState<UserProfile[]>([]);
-
-  // ----- Fetch users -----
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchEmployees = async () => {
       try {
-        const users = await getAllUsers();
-        setUserData(users);
+        const data = await getEmployees();
+        setEmployees(data);
       } catch (err) {
-        console.error("Error fetching Users", err);
+        console.error("Error fetching employees", err);
       }
     };
-
-    fetchUsers();
+    fetchEmployees();
   }, []);
 
-  // ----- Filter + Search + Sort -----
   const filteredData = useMemo(() => {
-    let filtered = [...userData];
-
-    // Filter by role
-    if (category) {
-      filtered = filtered.filter((u) => u.role === category);
-    }
-
-    // Search by full name
+    let filtered = [...employees];
+    if (category) filtered = filtered.filter((e) => e.employmentStatus === category);
     if (search.trim()) {
       const lower = search.toLowerCase();
-      filtered = filtered.filter((u) => u.fullName?.toLowerCase().startsWith(lower));
+      filtered = filtered.filter((e) => e.fullName?.toLowerCase().includes(lower));
     }
 
-    // Sort
     filtered.sort((a, b) => {
-      let valA: string | number;
-      let valB: string | number;
-
+      let valA: string | number = "";
+      let valB: string | number = "";
       switch (sortBy) {
         case "createdAt":
-          valA = getTimestamp(a.createdAt);
-          valB = getTimestamp(b.createdAt);
+          valA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.createdAt).getTime();
+          valB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.createdAt).getTime();
           break;
-        case "fullName":
-          valA = a.fullName?.toLowerCase() ?? "";
-          valB = b.fullName?.toLowerCase() ?? "";
+        case "employmentStatus":
+          valA = a.positionTitle?.toLowerCase() ?? "";
+          valB = b.positionTitle?.toLowerCase() ?? "";
+          break;
+        case "sex":
+          valA = a.positionTitle?.toLowerCase() ?? "";
+          valB = b.positionTitle?.toLowerCase() ?? "";
           break;
         default:
-          valA = a.role;
-          valB = b.role;
+          valA = a.fullName?.toLowerCase() ?? "";
+          valB = b.fullName?.toLowerCase() ?? "";
       }
-
       if (valA < valB) return sortDir === "asc" ? -1 : 1;
       if (valA > valB) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
 
     return filtered;
-  }, [userData, search, category, sortBy, sortDir]);
+  }, [employees, search, category, sortBy, sortDir]);
 
-  // ----- Pagination -----
   const totalItems = filteredData.length;
   const totalPages = Math.ceil(totalItems / PAGE_SIZE);
-
   const paginatedData = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
     return filteredData.slice(start, start + PAGE_SIZE);
   }, [filteredData, page]);
 
-  // Reset page when filters/search change
   const handleFilterChange = (setter: (val: string) => void) => (val: string) => {
     setter(val);
     setPage(1);
+  };
+
+  const handleRowClick = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    navigate(`/employee/${employee.employeeId}`);
   };
 
   return (
@@ -103,17 +94,18 @@ export default function EmployeeContent() {
               placeholder="Search name..."
               value={search}
               onChange={(e) => handleFilterChange(setSearch)(e.target.value)}
-              className="w-full md:w-64 rounded-lg border px-3 py-2 text-sm"
+              className="w-full md:w-128 rounded-lg border px-3 py-2 text-sm"
             />
 
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as "role" | "fullName" | "createdAt")}
+              onChange={(e) => setSortBy(e.target.value as "fullName" | "sex" | "employmentStatus" | "createdAt")}
               className="rounded-lg border px-3 py-2 text-sm"
             >
-              <option value="role">Sort by Role</option>
               <option value="fullName">Sort by Name</option>
-              <option value="createdAt">Sort by Created</option>
+              <option value="sex">Sort by Sex</option>
+              <option value="employmentStatus">Sort by Employment Status</option>
+              <option value="createdAt">Sort by Date</option>
             </select>
 
             <select
@@ -121,8 +113,8 @@ export default function EmployeeContent() {
               onChange={(e) => setSortDir(e.target.value as "asc" | "desc")}
               className="rounded-lg border px-3 py-2 text-sm"
             >
-              <option value="desc">Descending</option>
               <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
             </select>
 
             <select
@@ -130,9 +122,9 @@ export default function EmployeeContent() {
               onChange={(e) => handleFilterChange(setCategory)(e.target.value)}
               className="rounded-lg border px-3 py-2 text-sm"
             >
-              <option value="">All Roles</option>
-              <option value="staff">Staff</option>
-              <option value="admin">Admin</option>
+              <option value="">All Employment Status</option>
+              <option value="Permanent">Permanent</option>
+              <option value="Temporary">Temporary</option>
             </select>
           </div>
         </div>
@@ -141,18 +133,16 @@ export default function EmployeeContent() {
       {/* Table */}
       <div className="flex-1 overflow-y-auto p-6">
         <div className="border rounded-lg overflow-x-auto bg-white">
-          <table className="w-full">
+          <table className="w-full min-w-150">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="px-4 py-3 text-left">UID</th>
-                <th className="px-4 py-3 text-left">Fullname</th>
-                <th className="px-4 py-3 text-left">Email</th>
-                <th className="px-4 py-3 text-left">Role</th>
-                <th className="px-4 py-3 text-left">Created</th>
+                <th className="px-4 py-3 text-left">Employee ID</th>
+                <th className="px-4 py-3 text-left">Name</th>
+                <th className="px-4 py-3 text-left">Position</th>
+                <th className="px-4 py-3 text-left">Employment Status</th>
               </tr>
             </thead>
-
-            <EmployeeTable userDatas={paginatedData} />
+            <EmployeeTable employeeData={paginatedData} onRowClick={handleRowClick} />
           </table>
         </div>
       </div>

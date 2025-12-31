@@ -9,6 +9,8 @@ import ProtectedRoute from "./app/routes/ProtectedRoute";
 import PublicRoute from "./app/routes/PublicRoute";
 
 import TestAuth from "./components/auth/TestAuth";
+import EmployeeProfile from "./pages/employee/EmployeeProfile";
+import EmployeeFiles from "./components/employee/EmployeeFiles";
 
 function App() {
   return (
@@ -34,6 +36,24 @@ function App() {
         element={
           <ProtectedRoute>
             <MainPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/employee/:employeeId"
+        element={
+          <ProtectedRoute>
+            <EmployeeProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/employee/:employeeId/files"
+        element={
+          <ProtectedRoute>
+            <EmployeeFiles />
           </ProtectedRoute>
         }
       />

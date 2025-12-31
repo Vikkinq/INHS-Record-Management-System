@@ -39,6 +39,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
             email: firebaseUser.email,
             role: snap.data()?.role || "staff",
             provider: providerMap[providerId] ?? "other",
+            fullName: snap.data()?.fullName ?? firebaseUser.displayName ?? "",
             createdAt: snap.data()?.createdAt || serverTimestamp(),
           });
         } else {
