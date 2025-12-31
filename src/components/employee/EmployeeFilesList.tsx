@@ -122,6 +122,7 @@ export default function EmployeeFilesList({ files, onFileClick }: EmployeeFilesP
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left font-semibold text-gray-700">Name</th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-700">Owner</th>
                   <th className="px-6 py-3 text-left font-semibold text-gray-700">Category</th>
                   <th className="px-6 py-3 text-left font-semibold text-gray-700">Type</th>
                   <th className="px-6 py-3 text-left font-semibold text-gray-700">Size</th>
@@ -144,6 +145,8 @@ export default function EmployeeFilesList({ files, onFileClick }: EmployeeFilesP
                         {file.fileName}
                       </div>
                     </td>
+                    <td className="px-6 py-3 text-gray-600 uppercase text-xs font-medium">{file.employeeId}</td>
+                    <td className="px-6 py-3 text-gray-600 uppercase text-xs font-medium">{file.category}</td>
                     <td className="px-6 py-3 text-gray-600 uppercase text-xs font-medium">{file.fileType}</td>
                     <td className="px-6 py-3 text-gray-600">{formatFileSize(file.fileSize)}</td>
                     <td className="px-6 py-3 text-gray-600">{formatDate(file.createdAt)}</td>

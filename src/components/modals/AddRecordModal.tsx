@@ -1,27 +1,45 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { uploadFile } from "../../services/file.services";
-import { getFileType } from "../../utils/file.utils";
+import { getFileType, isValidFileType } from "../../utils/file.utils";
 import type { FileRecord } from "@/types/Files";
 import LoadingSpinner from "@/components/general/LoadingSpinner";
 import { useToast } from "../general/Toast";
 
-import { isValidFileType } from "../../utils/file.utils";
+import { getUserProfile } from "@/services/user.services"; // fetch user metadata
 
 interface FileUploadModalProps {
   onClose: () => void;
-  user: { uid: string; displayName?: string | null; email: string }; // Auth user type
-  onUploaded: (file: FileRecord[]) => void;
+  userId: string; // Auth uid
+  onUploaded: (files: FileRecord[]) => void;
 }
 
-export default function FileUploadModal({ onClose, user, onUploaded }: FileUploadModalProps) {
+export default function FileUploadModal({ onClose, userId, onUploaded }: FileUploadModalProps) {
   const { addToast } = useToast();
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [category, setCategory] = useState<string>(""); // default can be empty or "Other"
-
+  const [category, setCategory] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState<{
+    employeeId?: string | null;
+    displayName?: string | null;
+    email?: string;
+  }>({});
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 🔹 Fetch Firestore user metadata on mount
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const profile = await getUserProfile(userId);
+        setUserProfile(profile);
+      } catch (err) {
+        console.error(err);
+        addToast("Failed to fetch user metadata", "error");
+      }
+    };
+    fetchUser();
+  }, [userId]);
 
   const handleFilesAdded = (files: FileList) => {
     setSelectedFiles((prev) => [...prev, ...Array.from(files)]);
@@ -32,28 +50,34 @@ export default function FileUploadModal({ onClose, user, onUploaded }: FileUploa
   };
 
   const handleUpload = async () => {
-    if (!user) return;
+    if (!userProfile.employeeId) {
+      addToast("Employee information missing!", "error");
+      return;
+    }
+
     setLoading(true);
     const uploaded: FileRecord[] = [];
+
     for (const file of selectedFiles) {
       try {
         if (!isValidFileType(file)) {
-          alert(`Invalid file type: ${file.name}`);
+          addToast(`Invalid file type: ${file.name}`, "error");
           continue;
         }
 
         const newFile = await uploadFile(file, {
-          employeeId: user.uid, // reference employee
-          uploadedBy: user.displayName || user.email, // current user
-          fileName: file.name, // file name from frontend
-          fileType: getFileType(file), // convert MIME to "pdf", "doc", etc
+          employeeId: userProfile.employeeId, // 🔹 Use Firestore employeeId
+          uploadedBy: userProfile.displayName || userProfile.email || "Unknown",
+          fileName: file.name,
+          fileType: getFileType(file),
           category,
         });
 
         uploaded.push(newFile);
-        addToast("Record Successfully Added!", "success");
+        addToast(`File "${file.name}" uploaded!`, "success");
       } catch (err) {
         console.error(err);
+        addToast(`Failed to upload "${file.name}"`, "error");
       }
     }
 
@@ -68,8 +92,6 @@ export default function FileUploadModal({ onClose, user, onUploaded }: FileUploa
       {loading && <LoadingSpinner label="Uploading file..." />}
 
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md sm:max-w-lg">
-        {/* Header */}
-
         <div className="mb-4">
           <h2 className="text-xl font-semibold text-slate-800">Upload Files</h2>
           <p className="text-sm text-slate-500 mt-1">Drag & drop files or browse from your device</p>

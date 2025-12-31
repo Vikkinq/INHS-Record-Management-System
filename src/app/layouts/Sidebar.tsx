@@ -1,7 +1,7 @@
 import { logout } from "../../services/auth.services";
 import { Upload, File, Users, HelpCircle, LogOut, Files } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/AuthContext";
+// import { useAuth } from "@/context/AuthContext";
 
 type SidebarProps = {
   onClick?: () => void;
@@ -23,7 +23,7 @@ export default function Sidebar({
   onToggleView,
   activeView,
 }: SidebarProps) {
-  const { user } = useAuth();
+  // const { user } = useAuth();
 
   return (
     <>

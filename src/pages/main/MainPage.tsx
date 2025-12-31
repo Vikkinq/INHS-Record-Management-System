@@ -155,7 +155,7 @@ export default function MainPage() {
 
           {/* --- MODALS --- */}
           {activeModal === "addRecord" && user && (
-            <FileUploadModal onClose={() => setActiveModal(null)} user={user} onUploaded={handleFileUploaded} />
+            <FileUploadModal onClose={() => setActiveModal(null)} userId={user.uid} onUploaded={handleFileUploaded} />
           )}
 
           {activeModal === "updateRecord" && fileToUpdate && (

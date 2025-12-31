@@ -12,6 +12,9 @@ export const createUserProfile = async (input: CreateUserProfileInput) => {
       role: input.role,
       fullName: input.fullName,
       provider: input.provider ?? "email",
+
+      employeeId: input.employeeId ?? null, // 🔥 THIS LINE FIXES EVERYTHING
+
       createdAt: serverTimestamp(),
     });
   }
@@ -30,3 +33,17 @@ export async function getAllUsers(): Promise<UserProfile[]> {
 
   return users;
 }
+
+export const getUserProfile = async (uid: string): Promise<UserProfile> => {
+  const userRef = doc(db, "users", uid);
+  const snap = await getDoc(userRef);
+
+  if (!snap.exists()) {
+    throw new Error("User profile not found");
+  }
+
+  return {
+    uid: snap.id,
+    ...(snap.data() as Omit<UserProfile, "uid">),
+  };
+};

@@ -6,6 +6,9 @@ export interface UserProfile {
   email: string;
   role: UserRole;
   fullName: string;
+
+  employeeId?: string | null; // ✅ stored in Firestore
+
   provider: AuthProvider;
   createdAt: any;
 }
@@ -17,4 +20,6 @@ export type CreateUserProfileInput = {
   role: UserRole;
   fullName: string;
   provider?: AuthProvider;
+
+  employeeId?: string | null; // 🔥 ADD THIS
 };
