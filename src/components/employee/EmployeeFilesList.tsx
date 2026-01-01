@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import type { FileRecord } from "@/types/Files";
 
+import EmployeeFilesTableList from "./EmployeeFilesTableList";
+
 type EmployeeFilesProps = {
   files: FileRecord[];
   onFileClick: (file: FileRecord) => void;
@@ -8,35 +10,14 @@ type EmployeeFilesProps = {
 
 const PAGE_SIZE = 30;
 
-// Helper function to format file size
-const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return "0 B";
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
-};
-
-// Helper function to format date
-const formatDate = (date: string | Date): string => {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "2-digit",
-    day: "2-digit",
-    year: "numeric",
-  });
-};
-
 export default function EmployeeFilesList({ files, onFileClick }: EmployeeFilesProps) {
-  // Toolbar states
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [sortBy, setSortBy] = useState<"fileName" | "createdAt">("createdAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  // Pagination
   const [page, setPage] = useState(1);
 
-  // Filtering & sorting
   const filteredData = useMemo(() => {
     let data = files;
 
@@ -131,27 +112,7 @@ export default function EmployeeFilesList({ files, onFileClick }: EmployeeFilesP
               </thead>
 
               <tbody>
-                {paginatedData.map((file) => (
-                  <tr
-                    key={file.fileId}
-                    onClick={() => onFileClick(file)}
-                    className="cursor-pointer hover:bg-gray-50 border-b border-gray-200 last:border-b-0 transition-colors"
-                  >
-                    <td className="px-6 py-3 font-medium text-gray-900">
-                      <div className="flex items-center gap-3">
-                        <svg className="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
-                        </svg>
-                        {file.fileName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-3 text-gray-600 uppercase text-xs font-medium">{file.employeeId}</td>
-                    <td className="px-6 py-3 text-gray-600 uppercase text-xs font-medium">{file.category}</td>
-                    <td className="px-6 py-3 text-gray-600 uppercase text-xs font-medium">{file.fileType}</td>
-                    <td className="px-6 py-3 text-gray-600">{formatFileSize(file.fileSize)}</td>
-                    <td className="px-6 py-3 text-gray-600">{formatDate(file.createdAt)}</td>
-                  </tr>
-                ))}
+                <EmployeeFilesTableList paginatedData={paginatedData} onFileClick={onFileClick} />
               </tbody>
             </table>
           </div>

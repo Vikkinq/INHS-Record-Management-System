@@ -21,6 +21,7 @@ export default function EmployeeTable({ employeeData, onRowClick }: EmployeeTabl
             {"fullName" in employee ? (employee as any).fullName : "—"}
           </td>
 
+          <td className="px-4 py-3">{employee.sex}</td>
           <td className="px-4 py-3">{employee.positionTitle}</td>
 
           <td className="px-4 py-3 capitalize">{employee.employmentStatus}</td>

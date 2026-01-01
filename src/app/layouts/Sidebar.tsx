@@ -60,7 +60,7 @@ export default function Sidebar({
             onClick={onClick}
           >
             <Upload className="w-5 h-5" />
-            New
+            Upload
           </Button>
         </div>
 
@@ -86,13 +86,15 @@ export default function Sidebar({
           <div className="border-t border-sidebar-border my-3" />
 
           <div className="space-y-1">
-            <button
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
-              onClick={() => setRecordFilter?.("all")}
-            >
-              <Users className="w-5 h-5" />
-              <span className="text-sm font-medium">All Records</span>
-            </button>
+            {activeView === "files" ? (
+              <button
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
+                onClick={() => setRecordFilter?.("all")}
+              >
+                <Users className="w-5 h-5" />
+                <span className="text-sm font-medium">All Records</span>
+              </button>
+            ) : null}
             {activeView === "files" ? (
               <button
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"

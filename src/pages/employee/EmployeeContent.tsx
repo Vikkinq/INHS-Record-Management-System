@@ -125,6 +125,7 @@ export default function EmployeeContent() {
               <option value="">All Employment Status</option>
               <option value="Permanent">Permanent</option>
               <option value="Temporary">Temporary</option>
+              <option value="Part-time">Part-time</option>
             </select>
           </div>
         </div>
@@ -138,6 +139,7 @@ export default function EmployeeContent() {
               <tr>
                 <th className="px-4 py-3 text-left">Employee ID</th>
                 <th className="px-4 py-3 text-left">Name</th>
+                <th className="px-4 py-3 text-left">Gender</th>
                 <th className="px-4 py-3 text-left">Position</th>
                 <th className="px-4 py-3 text-left">Employment Status</th>
               </tr>

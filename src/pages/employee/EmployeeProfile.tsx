@@ -1,5 +1,4 @@
-"use client";
-
+import { formatDate } from "@/utils/general.utils";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, User, Briefcase, Calendar, GraduationCap, Info, FileText } from "lucide-react";
@@ -45,12 +44,6 @@ export default function EmployeeProfilePage() {
   if (loading) return <LoadingSpinner label="Loading Employee Datas" />;
   if (error || !employee)
     return <div className="min-h-screen flex items-center justify-center">{error || "Employee not found"}</div>;
-
-  // Helper to format dates
-  const formatDate = (date: string | undefined) => {
-    if (!date) return "-";
-    return new Date(date).toLocaleDateString();
-  };
 
   // Reusable row component
   const InfoRow = ({ label, value }: { label: string; value?: string | number }) => (
