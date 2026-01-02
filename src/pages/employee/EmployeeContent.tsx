@@ -1,20 +1,21 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { getEmployees } from "@/services/employee.services";
 import type { Employee } from "@/types/Employee";
 import EmployeeTable from "./EmployeeTable";
 
 const PAGE_SIZE = 30;
 
-export default function EmployeeContent() {
-  const navigate = useNavigate();
+type Props = {
+  onEmployeeClick: (employee: Employee) => void;
+};
+
+export default function EmployeeContent({ onEmployeeClick }: Props) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [sortBy, setSortBy] = useState<"fullName" | "sex" | "employmentStatus" | "createdAt">("fullName");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [page, setPage] = useState(1);
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -76,10 +77,10 @@ export default function EmployeeContent() {
     setPage(1);
   };
 
-  const handleRowClick = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    navigate(`/employee/${employee.employeeId}`);
-  };
+  // const handleRowClick = (employee: Employee) => {
+  //   setSelectedEmployee(employee);
+  //   navigate(`/employee/${employee.employeeId}`);
+  // };
 
   return (
     <main className="flex-1 flex flex-col overflow-hidden bg-slate-50">
@@ -144,7 +145,7 @@ export default function EmployeeContent() {
                 <th className="px-4 py-3 text-left">Employment Status</th>
               </tr>
             </thead>
-            <EmployeeTable employeeData={paginatedData} onRowClick={handleRowClick} />
+            <EmployeeTable employeeData={paginatedData} onRowClick={onEmployeeClick} />
           </table>
         </div>
       </div>

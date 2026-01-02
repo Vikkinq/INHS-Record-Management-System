@@ -10,6 +10,8 @@ import type { FileRecord } from "@/types/Files";
 import LoadingSpinner from "../general/LoadingSpinner";
 import { EmployeeFilesNavbar } from "@/app/layouts/EmployeeNavbar";
 
+import { FilePreview } from "@/app/layouts/Preview/FilePreview";
+
 export default function EmployeeFiles() {
   const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
@@ -82,14 +84,15 @@ export default function EmployeeFiles() {
         </div>
 
         {/* RightBar */}
-        {selectedFile && (
-          <RightBar
-            selectedFile={selectedFile}
-            onClose={() => setSelectedFile(null)}
-            onDeleteFile={() => {}}
-            onUpdateClick={() => {}}
-          />
-        )}
+        <RightBar isOpen={!!selectedFile} onClose={() => setSelectedFile(null)} title="File Details">
+          {selectedFile && (
+            <FilePreview
+              file={selectedFile}
+              onDelete={() => console.log("delete")}
+              onUpdate={() => console.log("update")}
+            />
+          )}
+        </RightBar>
       </div>
     </div>
   );

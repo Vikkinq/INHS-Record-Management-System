@@ -32,10 +32,10 @@ export const getFileType = (file: File): FileType => {
   }
 };
 
-export const canEditFile = (file: FileRecord, user: UserProfile): boolean => {
-  if (!user) return false;
+export const canEditFile = (file: FileRecord, currUser: UserProfile | null): boolean => {
+  if (!currUser) return false;
 
-  return user.role === "admin" || file.employeeId === user.uid;
+  return currUser.role === "admin" || file.userId === currUser.uid;
 };
 
 export const formatFileSize = (bytes: number): string => {

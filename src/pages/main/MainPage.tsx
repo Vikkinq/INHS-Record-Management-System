@@ -1,10 +1,16 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Users } from "lucide-react";
 
 import MainContent from "../../components/homepage/MainContent";
 import Sidebar from "@/app/layouts/Sidebar";
 import { NavBar } from "@/app/layouts/Navbar";
 import { RightBar } from "@/app/layouts/Rightbar";
 import EmployeeContent from "../employee/EmployeeContent";
+import type { Employee } from "@/types/Employee";
+
+import { FilePreview } from "@/app/layouts/Preview/FilePreview";
+import EmployeePreview from "@/app/layouts/Preview/EmployeePreview";
 
 import FileUploadModal from "@/components/modals/AddRecordModal";
 import UpdateRecordModal from "@/components/modals/UpdateRecordModal";
@@ -20,19 +26,21 @@ import type { FileRecord } from "@/types/Files";
 import { getFiles, deleteFile } from "@/services/file.services";
 
 type ModalType = "addRecord" | "updateRecord" | "createUser" | "help" | "createEmployee" | null;
+type RightBarView = { type: "file"; data: FileRecord } | { type: "employee"; data: Employee } | null;
 
 export default function MainPage() {
   const { addToast } = useToast();
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   // Files & selected file
   const [files, setFiles] = useState<FileRecord[]>([]);
   const [filesLoading, setFilesLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<FileRecord | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
   const [fileToUpdate, setFileToUpdate] = useState<FileRecord | null>(null);
 
   const [activeView, setActiveView] = useState<"files" | "employees">("employees");
+  const [rightBar, setRightBar] = useState<RightBarView>(null);
 
   // Sidebar
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -55,12 +63,6 @@ export default function MainPage() {
       setFilesLoading(false);
     }
   };
-
-  const handleFileClick = (file: FileRecord) => {
-    setSelectedFile(file);
-    setShowDetails(true);
-  };
-
   const handleFileUploaded = (newFiles: FileRecord[]) => {
     setFiles((prev) => [...newFiles, ...prev]);
   };
@@ -84,6 +86,14 @@ export default function MainPage() {
   // const toggleView = () => {
   //   setActiveView((prev) => (prev === "files" ? "employees" : "files"));
   // };
+
+  const handleEmployeeClick = (employee: Employee) => {
+    setRightBar({ type: "employee", data: employee });
+  };
+
+  const handleFilesClick = (file: FileRecord) => {
+    setRightBar({ type: "file", data: file });
+  };
 
   useEffect(() => {
     if (user) {
@@ -120,7 +130,7 @@ export default function MainPage() {
         activeView={activeView}
       />
 
-      {/* Mobile overlay */}
+      {/* Mobile overlay for sidebar */}
       {sidebarOpen && <div className="fixed inset-0 bg-black/50 md:hidden" onClick={() => setSidebarOpen(false)} />}
 
       {/* Main content */}
@@ -130,46 +140,64 @@ export default function MainPage() {
           onBurgerClick={() => setSidebarOpen(true)}
           onCreateUser={() => setActiveModal("createUser")}
           onCreateEmployee={() => setActiveModal("createEmployee")}
+          rightBar={rightBar}
         />
 
-        <div className="flex-1 flex overflow-hidden">
+        {/* Main content + RightBar */}
+        <div className={`flex-1 flex overflow-hidden transition-all duration-300 ${rightBar ? "md:mr-80" : ""}`}>
           {/* Main scrollable table */}
-          {activeView === "files" && (
-            <MainContent files={files} selectedFile={selectedFile} onFileClick={handleFileClick} />
-          )}
+          <div className="flex-1 overflow-auto">
+            {activeView === "files" && (
+              <MainContent files={files} selectedFile={selectedFile} onFileClick={handleFilesClick} />
+            )}
 
-          {activeView === "employees" && <EmployeeContent />}
+            {activeView === "employees" && <EmployeeContent onEmployeeClick={handleEmployeeClick} />}
+          </div>
 
           {/* Right sidebar */}
-          {showDetails && selectedFile && (
+          {rightBar && (
             <RightBar
-              selectedFile={selectedFile}
-              onClose={() => setShowDetails(false)}
-              onDeleteFile={handleFileDelete}
-              onUpdateClick={(file) => {
-                setFileToUpdate(file);
-                setActiveModal("updateRecord");
-              }}
-            />
-          )}
+              isOpen={!!rightBar}
+              onClose={() => setRightBar(null)}
+              title={rightBar.type === "file" ? "File Details" : "Employee Overview"}
+              icon={rightBar.type === "file" ? null : <Users className="w-10 h-10 text-blue-500" />}
+            >
+              {rightBar.type === "file" && (
+                <FilePreview
+                  file={rightBar.data}
+                  onDelete={handleFileDelete}
+                  onUpdate={(file) => {
+                    setFileToUpdate(file);
+                    setActiveModal("updateRecord");
+                  }}
+                />
+              )}
 
-          {/* --- MODALS --- */}
-          {activeModal === "addRecord" && user && (
-            <FileUploadModal onClose={() => setActiveModal(null)} userId={user.uid} onUploaded={handleFileUploaded} />
-          )}
-
-          {activeModal === "updateRecord" && fileToUpdate && (
-            <UpdateRecordModal file={fileToUpdate} onClose={() => setActiveModal(null)} onUpdate={handleUpdateFile} />
-          )}
-
-          {activeModal === "createUser" && <CreateUserModal onClose={() => setActiveModal(null)} isOpen={true} />}
-
-          {activeModal === "help" && <HelpModal onClose={() => setActiveModal(null)} />}
-
-          {activeModal === "createEmployee" && (
-            <CreateEmployeeModal onClose={() => setActiveModal(null)} isOpen={true} />
+              {rightBar.type === "employee" && (
+                <EmployeePreview
+                  employee={rightBar.data}
+                  onSeeProfile={() => navigate(`/employee/${rightBar.data.employeeId}`)}
+                  onSeeFiles={() => navigate(`/employee/${rightBar.data.employeeId}/files`)}
+                />
+              )}
+            </RightBar>
           )}
         </div>
+
+        {/* --- MODALS --- */}
+        {activeModal === "addRecord" && user && (
+          <FileUploadModal onClose={() => setActiveModal(null)} userId={user.uid} onUploaded={handleFileUploaded} />
+        )}
+
+        {activeModal === "updateRecord" && fileToUpdate && (
+          <UpdateRecordModal file={fileToUpdate} onClose={() => setActiveModal(null)} onUpdate={handleUpdateFile} />
+        )}
+
+        {activeModal === "createUser" && <CreateUserModal onClose={() => setActiveModal(null)} isOpen={true} />}
+
+        {activeModal === "help" && <HelpModal onClose={() => setActiveModal(null)} />}
+
+        {activeModal === "createEmployee" && <CreateEmployeeModal onClose={() => setActiveModal(null)} isOpen={true} />}
       </div>
     </div>
   );

@@ -71,6 +71,7 @@ export default function FileUploadModal({ onClose, userId, onUploaded }: FileUpl
           fileName: file.name,
           fileType: getFileType(file),
           category,
+          userId: userId,
         });
 
         uploaded.push(newFile);

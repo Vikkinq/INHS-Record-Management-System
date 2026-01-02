@@ -1,5 +1,5 @@
 import { db } from "@/config/firebase";
-import { collection, addDoc, getDocs, getDoc, doc, serverTimestamp, query, where } from "firebase/firestore";
+import { collection, addDoc, getDocs, getDoc, doc, serverTimestamp, query, where, updateDoc } from "firebase/firestore";
 
 import type { Employee } from "@/types/Employee";
 import type { FileRecord } from "@/types/Files";
@@ -60,4 +60,19 @@ export const getFilesByEmployeeId = async (employeeId: string): Promise<FileReco
       updatedAt: data.updatedAt,
     } as FileRecord;
   });
+};
+
+export const updateEmployee = async (employeeId: string, payload: Partial<Employee>): Promise<Employee> => {
+  const ref = doc(db, "employees", employeeId);
+
+  await updateDoc(ref, {
+    ...payload,
+    updatedAt: serverTimestamp(),
+  });
+
+  // Return merged object for optimistic UI
+  return {
+    employeeId,
+    ...payload,
+  } as Employee;
 };

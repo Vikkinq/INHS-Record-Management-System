@@ -1,22 +1,66 @@
 import { formatDate } from "@/utils/general.utils";
 import { useEffect, useState } from "react";
+
+import { useAuth } from "@/context/AuthContext";
+import { canEditEmployee } from "@/utils/general.utils";
+
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, User, Briefcase, Calendar, GraduationCap, Info, FileText } from "lucide-react";
 
 import type { Employee } from "@/types/Employee";
 import { getEmployeeById } from "@/services/employee.services";
-import { getFilesByEmployeeId } from "@/services/employee.services";
+import { getFilesByEmployeeId, updateEmployee } from "@/services/employee.services";
+import { EMPLOYEE_SECTION_FIELDS, calculateAge } from "@/utils/employee_updates.utils";
+
+import UpdateEmployeeModal from "@/components/modals/UpdateEmployeeModal";
 
 import LoadingSpinner from "@/components/general/LoadingSpinner";
+
+export type EmployeeEditSection = "personal" | "employment" | "appointment" | "education";
 
 export default function EmployeeProfilePage() {
   const navigate = useNavigate();
   const { employeeId } = useParams(); // /employee/:employeeId
+  const { user } = useAuth();
 
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fileCount, setFileCount] = useState<number>(0);
+
+  // Edit States
+  const [editSection, setEditSection] = useState<EmployeeEditSection | null>(null);
+  const canEdit = canEditEmployee(employee, user);
+
+  const handleUpdate = async (section: EmployeeEditSection, data: Partial<Employee>) => {
+    if (!employee || !canEdit) return;
+
+    // Only allow fields for this section
+    const allowedFields = EMPLOYEE_SECTION_FIELDS[section];
+
+    const payload: Partial<Employee> = {};
+
+    allowedFields.forEach((field) => {
+      if (field in data) {
+        payload[field] = data[field as keyof Employee];
+      }
+    });
+
+    // Auto-calculate age if DOB is edited
+    if (section === "personal" && data.dateOfBirth) {
+      payload.age = calculateAge(data.dateOfBirth);
+    }
+
+    try {
+      const updated = await updateEmployee(employee.employeeId, payload);
+      console.log(updated);
+      // Optimistic UI merge
+      setEmployee((prev) => (prev ? { ...prev, ...payload } : prev));
+    } catch (err) {
+      console.error("Update failed:", err);
+      alert("Failed to update employee.");
+    }
+  };
 
   useEffect(() => {
     if (!employeeId) return;
@@ -87,10 +131,22 @@ export default function EmployeeProfilePage() {
 
         {/* Personal Information */}
         <div className="border-2 border-border rounded-lg bg-background p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <User className="w-5 h-5 text-blue-700 " />
-            <h2 className="text-lg font-semibold text-foreground">Personal Information</h2>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <User className="w-5 h-5 text-blue-700" />
+              <h2 className="text-lg font-semibold">Personal Information</h2>
+            </div>
+
+            {canEdit && (
+              <button
+                onClick={() => setEditSection("personal")}
+                className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
+              >
+                ✏️ Edit
+              </button>
+            )}
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <InfoRow label="Full Name" value={employee.fullName} />
             <InfoRow label="Date of Birth" value={formatDate(employee.dateOfBirth)} />
@@ -101,9 +157,20 @@ export default function EmployeeProfilePage() {
 
         {/* Position / Employment Details */}
         <div className="border-2 border-border rounded-lg bg-background p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Briefcase className="w-5 h-5 text-blue-700" />
-            <h2 className="text-lg font-semibold text-foreground">Position / Employment Details</h2>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Briefcase className="w-5 h-5 text-blue-700" />
+              <h2 className="text-lg font-semibold">Position / Employment Details</h2>
+            </div>
+
+            {canEdit && (
+              <button
+                onClick={() => setEditSection("employment")}
+                className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
+              >
+                ✏️ Edit
+              </button>
+            )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <InfoRow label="Item Number" value={employee.itemNumber} />
@@ -117,9 +184,20 @@ export default function EmployeeProfilePage() {
 
         {/* Appointment Dates */}
         <div className="border-2 border-border rounded-lg bg-background p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Calendar className="w-5 h-5 text-blue-700" />
-            <h2 className="text-lg font-semibold text-foreground">Appointment Dates</h2>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Calendar className="w-5 h-5 text-blue-700" />
+              <h2 className="text-lg font-semibold">Appointment Dates</h2>
+            </div>
+
+            {canEdit && (
+              <button
+                onClick={() => setEditSection("appointment")}
+                className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
+              >
+                ✏️ Edit
+              </button>
+            )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <InfoRow label="Original Appointment Date" value={formatDate(employee.originalAppointmentDate)} />
@@ -129,9 +207,20 @@ export default function EmployeeProfilePage() {
 
         {/* Educational Background */}
         <div className="border-2 border-border rounded-lg bg-background p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <GraduationCap className="w-5 h-5 text-blue-700" />
-            <h2 className="text-lg font-semibold text-foreground">Educational Background</h2>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <GraduationCap className="w-5 h-5 text-blue-700" />
+              <h2 className="text-lg font-semibold">Education</h2>
+            </div>
+
+            {canEdit && (
+              <button
+                onClick={() => setEditSection("education")}
+                className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
+              >
+                ✏️ Edit
+              </button>
+            )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <InfoRow label="Bachelor's Degree" value={employee.education?.bachelor} />
@@ -153,6 +242,18 @@ export default function EmployeeProfilePage() {
           </div>
         </div>
       </div>
+
+      {editSection && employee && (
+        <UpdateEmployeeModal
+          employee={employee}
+          section={editSection}
+          onClose={() => setEditSection(null)}
+          onUpdated={(data) => {
+            handleUpdate(editSection, data);
+            setEditSection(null);
+          }}
+        />
+      )}
     </div>
   );
 }

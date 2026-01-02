@@ -2,17 +2,26 @@ import { Menu, User, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { UserProfile } from "@/types/User";
+import type { FileRecord } from "@/types/Files";
+import type { Employee } from "@/types/Employee";
+
+type RightBarView = { type: "file"; data: FileRecord } | { type: "employee"; data: Employee } | null;
 
 type NavBarProps = {
   onBurgerClick?: () => void; // mobile sidebar toggle
   onCreateUser?: () => void; // create user callback
   userData: UserProfile | null;
   onCreateEmployee?: () => void;
+  rightBar: RightBarView | null;
 };
 
-export function NavBar({ onBurgerClick, onCreateUser, userData, onCreateEmployee }: NavBarProps) {
+export function NavBar({ onBurgerClick, onCreateUser, userData, onCreateEmployee, rightBar }: NavBarProps) {
   return (
-    <header className="h-16 border-b border-border bg-background flex items-center px-4 md:px-6">
+    <header
+      className={`h-16 border-b border-border bg-background flex items-center px-4 md:px-6 transition-all duration-300 ${
+        rightBar ? "md:mr-80" : ""
+      }`}
+    >
       {/* Mobile Burger */}
       {onBurgerClick && (
         <button className="md:hidden p-2 mr-2" onClick={onBurgerClick} aria-label="Open sidebar">
