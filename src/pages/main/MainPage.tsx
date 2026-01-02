@@ -93,6 +93,7 @@ export default function MainPage() {
 
   const handleFilesClick = (file: FileRecord) => {
     setRightBar({ type: "file", data: file });
+    setSelectedFile(file); // May be a Bug idk..
   };
 
   useEffect(() => {

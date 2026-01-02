@@ -15,9 +15,6 @@ export function FilePreview({ file, onDelete, onUpdate }: Props) {
   const { user } = useAuth();
   const canEdit = user && canEditFile(file, user);
 
-  console.log("file: ", file.userId);
-  console.log("user: ", user?.uid);
-
   return (
     <div className="flex flex-col h-full justify-between">
       <div className="space-y-6">
