@@ -5,9 +5,10 @@ interface MainTableProps {
   files: FileRecord[];
   onSelectFile: FileRecord | null;
   onFileClick: (file: FileRecord) => void;
+  employeeMap: Record<string, string>;
 }
 
-export default function MainTable({ files, onSelectFile, onFileClick }: MainTableProps) {
+export default function MainTable({ files, onSelectFile, onFileClick, employeeMap }: MainTableProps) {
   return (
     <tbody>
       {files.map((f) => (
@@ -19,7 +20,7 @@ export default function MainTable({ files, onSelectFile, onFileClick }: MainTabl
           onClick={() => onFileClick(f)}
         >
           <td className="px-4 py-3">{f.fileName}</td>
-          <td className="px-4 py-3">{f.uploadedBy}</td>
+          <td className="px-4 py-3">{f.employeeId ? employeeMap[f.employeeId] : "N/A"}</td>
           <td className="px-4 py-3">{formatDate(f.uploadedAt)}</td>
           <td className="px-4 py-3">{f.category}</td>
           <td className="px-4 py-3">{f.fileType}</td>

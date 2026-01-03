@@ -1,7 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import MainTable from "./MainTable";
 import type { FileRecord } from "@/types/Files";
 import { getTimestamp } from "@/utils/general.utils";
+import { getEmployees } from "@/services/employee.services";
+import type { Employee } from "@/types/Employee";
 
 type MainContentProps = {
   files: FileRecord[]; // always keep updated from parent
@@ -17,6 +19,8 @@ export default function MainContent({ files, selectedFile, onFileClick }: MainCo
   const [sortBy, setSortBy] = useState<"createdAt" | "fileName">("createdAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
+
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
   // ----- Filter + Search + Sort -----
   const filteredData = useMemo(() => {
@@ -67,6 +71,27 @@ export default function MainContent({ files, selectedFile, onFileClick }: MainCo
     setter(val);
     setPage(1);
   };
+
+  const fetchEmployees = async () => {
+    try {
+      const data = await getEmployees();
+      setEmployees(data);
+    } catch (err) {
+      console.error("Failed to fetch Employees: ", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const employeeMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    employees.forEach((e) => {
+      if (e.employeeId) map[e.employeeId] = e.fullName;
+    });
+    return map;
+  }, [employees]);
 
   return (
     <main className="flex-1 flex flex-col overflow-hidden bg-slate-50">
@@ -137,7 +162,12 @@ export default function MainContent({ files, selectedFile, onFileClick }: MainCo
                 <th className="px-4 py-3 text-left">Size</th>
               </tr>
             </thead>
-            <MainTable files={paginatedData} onSelectFile={selectedFile} onFileClick={onFileClick} />
+            <MainTable
+              files={paginatedData}
+              onSelectFile={selectedFile}
+              onFileClick={onFileClick}
+              employeeMap={employeeMap}
+            />
           </table>
         </div>
       </div>

@@ -126,7 +126,7 @@ export default function EmployeeProfilePage() {
         <div>
           <h1 className="text-4xl font-bold text-foreground mb-2">{employee.fullName}</h1>
           <p className="text-lg text-muted-foreground">{employee.positionTitle}</p>
-          <p className="text-sm text-muted-foreground">{employee.itemNumber}</p>
+          <p className="text-sm text-muted-foreground">{employee.employeeNumber}</p>
         </div>
 
         {/* Personal Information */}
