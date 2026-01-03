@@ -12,10 +12,14 @@ import { EmployeeFilesNavbar } from "@/app/layouts/EmployeeNavbar";
 
 import { FilePreview } from "@/app/layouts/Preview/FilePreview";
 import UploadEmployeeFileModal from "../modals/UploadEmployeeFileModal";
+import UpdateRecordModal from "../modals/UpdateRecordModal";
+import { deleteFile } from "@/services/file.services";
+import { useToast } from "../general/Toast";
 
 export default function EmployeeFiles() {
   const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const [files, setFiles] = useState<FileRecord[]>([]);
   const [selectedFile, setSelectedFile] = useState<FileRecord | null>(null);
@@ -23,6 +27,7 @@ export default function EmployeeFiles() {
   const [employee, setEmployee] = useState<Employee | null>(null);
 
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [updateFileModal, setUpdateFileModal] = useState(false);
 
   useEffect(() => {
     if (!employeeId) return;
@@ -55,12 +60,27 @@ export default function EmployeeFiles() {
     setFiles(updatedFiles);
   };
 
+  const handleFileDelete = async (file: FileRecord) => {
+    if (!window.confirm("Are you sure you want to delete this file?")) return;
+
+    try {
+      await deleteFile(file);
+      setFiles((prev) => prev.filter((f) => f.fileId !== file.fileId));
+      addToast("Record deleted!", "error");
+
+      // Close preview if deleted file is active
+      if (selectedFile?.fileId === file.fileId) setSelectedFile(null);
+    } catch (err) {
+      console.error("Cannot delete file:", err);
+      addToast("Failed to delete record.", "error");
+    }
+  };
+
   if (loading) return <LoadingSpinner label="Loading employee files..." />;
 
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
       <EmployeeFilesNavbar employee={employee} onBack={() => navigate(-1)} />
-
       <div className="flex flex-1 overflow-hidden">
         {/* Main Content Area */}
         <div className="flex-1 overflow-auto">
@@ -94,15 +114,22 @@ export default function EmployeeFiles() {
         {/* RightBar */}
         <RightBar isOpen={!!selectedFile} onClose={() => setSelectedFile(null)} title="File Details">
           {selectedFile && (
-            <FilePreview
-              file={selectedFile}
-              onDelete={() => console.log("delete")}
-              onUpdate={() => console.log("update")}
-            />
+            <FilePreview file={selectedFile} onDelete={handleFileDelete} onUpdate={() => setUpdateFileModal(true)} />
           )}
         </RightBar>
       </div>
-
+      // Modal toggle
+      {updateFileModal && selectedFile && (
+        <UpdateRecordModal
+          file={selectedFile}
+          onClose={() => setUpdateFileModal(false)}
+          onUpdate={(updatedFile) => {
+            // optional: update local state if needed
+            setFiles((prev) => prev.map((f) => (f.fileId === updatedFile.fileId ? updatedFile : f)));
+            setSelectedFile(updatedFile);
+          }}
+        />
+      )}
       {showUploadModal && employeeId && (
         <UploadEmployeeFileModal
           employeeId={employeeId}

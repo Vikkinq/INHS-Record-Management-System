@@ -73,11 +73,14 @@ export default function UpdateRecordModal({ file, onClose, onUpdate }: UpdateRec
             className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select category</option>
-            <option value="Report Card">Report Card</option>
-            <option value="Transcript">Transcript</option>
-            <option value="Certificate">Certificate</option>
-            <option value="Enrollment">Enrollment</option>
+            <option value="Personal Data">Personal Data</option>
+            <option value="Appointment">Appointment</option>
+            <option value="Educational Qualifications">Educational Qualifications</option>
+            <option value="Learning & Development">Learning & Development</option>
+            <option value="Performance">Performance</option>
+            <option value="Service Records">Service Records</option>
             <option value="Medical">Medical</option>
+            <option value="Administrative">Administrative</option>
             <option value="Other">Other</option>
           </select>
         </div>
