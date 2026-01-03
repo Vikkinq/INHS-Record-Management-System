@@ -16,7 +16,7 @@ import UpdateEmployeeModal from "@/components/modals/UpdateEmployeeModal";
 
 import LoadingSpinner from "@/components/general/LoadingSpinner";
 
-export type EmployeeEditSection = "personal" | "employment" | "appointment" | "education";
+export type EmployeeEditSection = "personal" | "employment" | "government" | "appointment" | "education";
 
 export default function EmployeeProfilePage() {
   const navigate = useNavigate();
@@ -179,6 +179,33 @@ export default function EmployeeProfilePage() {
             <InfoRow label="Step" value={employee.step} />
             <InfoRow label="Employment Status" value={employee.employmentStatus} />
             <InfoRow label="Nature of Appointment" value={employee.natureOfAppointment} />
+          </div>
+        </div>
+
+        {/* Government Credentials */}
+        <div className="border-2 border-border rounded-lg bg-background p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Briefcase className="w-5 h-5 text-blue-700" />
+              <h2 className="text-lg font-semibold">Government Identification Numbers</h2>
+            </div>
+
+            {canEdit && (
+              <button
+                onClick={() => setEditSection("government")}
+                className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
+              >
+                ✏️ Edit
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <InfoRow label="Employee Number" value={employee.employeeNumber} />
+            <InfoRow label="TIN Number" value={employee.tin} />
+            <InfoRow label="GSIS BP Number" value={employee.gsisBPNumber} />
+            <InfoRow label="PhilHealth Number" value={employee.philHealthNumber} />
+            <InfoRow label="PAG-IBIG MID Number" value={employee.pagIbigMIDNumber} />
+            <InfoRow label="LandBank Account Number" value={employee.landbankAccountNumber} />
           </div>
         </div>
 

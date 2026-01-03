@@ -138,7 +138,7 @@ export default function EmployeeContent({ onEmployeeClick }: Props) {
           <table className="w-full min-w-150">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="px-4 py-3 text-left">Employee ID</th>
+                <th className="px-4 py-3 text-left">Employee Number</th>
                 <th className="px-4 py-3 text-left">Name</th>
                 <th className="px-4 py-3 text-left">Gender</th>
                 <th className="px-4 py-3 text-left">Position</th>

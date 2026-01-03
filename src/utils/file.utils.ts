@@ -35,7 +35,7 @@ export const getFileType = (file: File): FileType => {
 export const canEditFile = (file: FileRecord, currUser: UserProfile | null): boolean => {
   if (!currUser) return false;
 
-  return currUser.role === "admin" || file.userId === currUser.uid;
+  return currUser.role === "admin" || currUser.role === "staff" || file.userId === currUser.uid;
 };
 
 export const formatFileSize = (bytes: number): string => {

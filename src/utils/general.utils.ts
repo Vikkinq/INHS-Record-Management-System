@@ -21,5 +21,5 @@ export const formatDate = (value: any): string => {
 export function canEditEmployee(employee: Employee | null, user: UserProfile | null) {
   if (!user) return false;
 
-  return user?.role === "admin" || employee?.userId === user.uid;
+  return user?.role === "admin" || employee?.userId === user.uid || user?.role === "staff";
 }

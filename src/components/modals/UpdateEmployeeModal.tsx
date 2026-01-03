@@ -48,6 +48,17 @@ export default function UpdateEmployeeModal({ employee, section, onClose, onUpda
         });
         break;
 
+      case "government":
+        setForm({
+          employeeNumber: employee.employeeNumber ?? "",
+          tin: employee.tin ?? "",
+          gsisBPNumber: employee.gsisBPNumber ?? "",
+          philHealthNumber: employee.philHealthNumber ?? "",
+          pagIbigMIDNumber: employee.pagIbigMIDNumber ?? "",
+          landbankAccountNumber: employee.landbankAccountNumber ?? "",
+        });
+        break;
+
       case "appointment":
         setForm({
           originalAppointmentDate: employee.originalAppointmentDate ?? "",
@@ -66,10 +77,21 @@ export default function UpdateEmployeeModal({ employee, section, onClose, onUpda
     }
   }, [employee, section]);
 
-  function handleChange<T extends string | number>(key: string, value: T) {
+  function handleChange(key: string, value: string) {
+    if (
+      [
+        "employeeNumber",
+        "tin",
+        "gsisBPNumber",
+        "philHealthNumber",
+        "pagIbigMIDNumber",
+        "landbankAccountNumber",
+      ].includes(key)
+    ) {
+      value = value.replace(/\D/g, ""); // remove non-digits
+    }
     setForm((prev) => ({ ...prev, [key]: value }));
   }
-
   // Auto-calc age when DOB changes
   useEffect(() => {
     if (section === "personal" && form.dateOfBirth) {
@@ -163,6 +185,70 @@ export default function UpdateEmployeeModal({ employee, section, onClose, onUpda
 
             <Field label="Step">
               <Input value={String(form.step)} onChange={(e) => handleChange("step", e.target.value)} />
+            </Field>
+          </>
+        );
+
+      case "government":
+        return (
+          <>
+            <Field label="Employee Number">
+              <Input
+                type="text"
+                value={form.employeeNumber ?? ""}
+                maxLength={7}
+                onChange={(e) => handleChange("employeeNumber", e.target.value.replace(/\D/g, ""))} // digits only
+                placeholder="7 digits"
+              />
+            </Field>
+            <Field label="TIN Number">
+              <Input
+                type="text"
+                value={form.tin ?? ""}
+                maxLength={9}
+                onChange={(e) => handleChange("tin", e.target.value.replace(/\D/g, ""))} // digits only
+                placeholder="9 digits"
+              />
+            </Field>
+
+            <Field label="GSIS BP Number">
+              <Input
+                type="text"
+                value={form.gsisBPNumber ?? ""}
+                maxLength={11}
+                onChange={(e) => handleChange("gsisBPNumber", e.target.value.replace(/\D/g, ""))}
+                placeholder="11 digits"
+              />
+            </Field>
+
+            <Field label="PhilHealth Number">
+              <Input
+                type="text"
+                value={form.philHealthNumber ?? ""}
+                maxLength={12}
+                onChange={(e) => handleChange("philHealthNumber", e.target.value.replace(/\D/g, ""))}
+                placeholder="12 digits"
+              />
+            </Field>
+
+            <Field label="PAG-IBIG MID Number">
+              <Input
+                type="text"
+                value={form.pagIbigMIDNumber ?? ""}
+                maxLength={12}
+                onChange={(e) => handleChange("pagIbigMIDNumber", e.target.value.replace(/\D/g, ""))}
+                placeholder="12 digits"
+              />
+            </Field>
+
+            <Field label="LandBank Account Number">
+              <Input
+                type="text"
+                value={form.landbankAccountNumber ?? ""}
+                maxLength={10}
+                onChange={(e) => handleChange("landbankAccountNumber", e.target.value.replace(/\D/g, ""))}
+                placeholder="10 digits"
+              />
             </Field>
           </>
         );

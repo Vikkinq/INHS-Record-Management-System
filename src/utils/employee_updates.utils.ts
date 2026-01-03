@@ -2,11 +2,19 @@ import type { EmployeeEditSection } from "@/pages/employee/EmployeeProfile";
 
 import type { Employee } from "@/types/Employee";
 
-export const EMPLOYEE_SECTION_FIELDS: Record<EmployeeEditSection, readonly (keyof Employee)[]> = {
-  personal: ["fullName", "dateOfBirth", "sex", "age"],
-  employment: ["itemNumber", "positionTitle", "salaryGrade", "step", "employmentStatus", "natureOfAppointment"],
+export const EMPLOYEE_SECTION_FIELDS: Record<EmployeeEditSection | "government", (keyof Employee)[]> = {
+  personal: ["fullName", "sex", "dateOfBirth", "age"],
+  employment: ["positionTitle", "itemNumber", "employmentStatus", "salaryGrade", "step"],
   appointment: ["originalAppointmentDate", "latestAppointmentDate"],
   education: ["education"],
+  government: [
+    "employeeNumber",
+    "tin",
+    "gsisBPNumber",
+    "philHealthNumber",
+    "pagIbigMIDNumber",
+    "landbankAccountNumber",
+  ],
 };
 export function calculateAge(dateOfBirth: string | Date) {
   const dob = new Date(dateOfBirth);

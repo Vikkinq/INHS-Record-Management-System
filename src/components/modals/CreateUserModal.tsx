@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useToast } from "../general/Toast";
 import { createUserProfile } from "@/services/user.services";
-import { createEmployee } from "@/services/employee.services";
-import type { CreateUserProfileInput } from "@/types/User";
 import { registerWithEmail } from "@/services/auth.services";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -16,8 +14,6 @@ type CreateUserModalProps = {
   onClose: () => void;
 };
 
-// ...imports remain the same
-
 export default function CreateUserModal({ isOpen, onClose }: CreateUserModalProps) {
   const { addToast } = useToast();
 
@@ -25,10 +21,6 @@ export default function CreateUserModal({ isOpen, onClose }: CreateUserModalProp
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"staff" | "admin">("staff");
-  const [sex, setSex] = useState<"Male" | "Female">("Male");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [positionTitle, setPositionTitle] = useState("");
-  const [employmentStatus, setEmploymentStatus] = useState<"Permanent" | "Temporary" | "Part-time">("Permanent");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,37 +28,17 @@ export default function CreateUserModal({ isOpen, onClose }: CreateUserModalProp
     setLoading(true);
 
     try {
-      // 1️⃣ Auth user
+      // 1️⃣ Register user in Firebase Auth
       const firebaseUser = await registerWithEmail(email, password);
 
-      // 2️⃣ Employee FIRST
-      const employee = await createEmployee({
-        fullName,
-        sex,
-        dateOfBirth,
-        userId: firebaseUser.uid,
-        itemNumber: "",
-        positionTitle,
-        salaryGrade: "",
-        step: "",
-        employmentStatus,
-        natureOfAppointment: "",
-        originalAppointmentDate: "",
-        latestAppointmentDate: "",
-        education: {},
-      });
-
-      // 3️⃣ User profile WITH employeeId
-      const userInput: CreateUserProfileInput = {
+      // 2️⃣ Create UserProfile in Firestore
+      await createUserProfile({
         uid: firebaseUser.uid,
         email: firebaseUser.email!,
         role,
         fullName,
         provider: "email",
-        employeeId: employee.employeeId,
-      };
-
-      await createUserProfile(userInput);
+      });
 
       addToast(`Successfully created ${fullName} as ${role}`, "success");
       onClose();
@@ -134,55 +106,6 @@ export default function CreateUserModal({ isOpen, onClose }: CreateUserModalProp
               <SelectContent>
                 <SelectItem value="staff">Staff</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Sex */}
-          <div className="space-y-1">
-            <Label>Sex</Label>
-            <Select value={sex} onValueChange={(value) => setSex(value as "Male" | "Female")}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select sex" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Male">Male</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Date of Birth */}
-          <div className="space-y-1">
-            <Label htmlFor="dob">Date of Birth</Label>
-            <Input id="dob" type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} required />
-          </div>
-
-          {/* Position Title */}
-          <div className="space-y-1">
-            <Label htmlFor="positionTitle">Position Title</Label>
-            <Input
-              id="positionTitle"
-              placeholder="e.g., Teacher"
-              value={positionTitle}
-              onChange={(e) => setPositionTitle(e.target.value)}
-            />
-          </div>
-
-          {/* Employment Status */}
-          <div className="space-y-1">
-            <Label>Employment Status</Label>
-            <Select
-              value={employmentStatus}
-              onValueChange={(value) => setEmploymentStatus(value as "Permanent" | "Temporary" | "Part-time")}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Permanent">Permanent</SelectItem>
-                <SelectItem value="Temporary">Temporary</SelectItem>
-                <SelectItem value="Part-time">Part-time</SelectItem>
               </SelectContent>
             </Select>
           </div>

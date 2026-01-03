@@ -108,11 +108,14 @@ export default function MainContent({ files, selectedFile, onFileClick }: MainCo
               className="rounded-lg border px-3 py-2 text-sm"
             >
               <option value="">All Categories</option>
-              <option value="Report Card">Report Card</option>
-              <option value="Transcript">Transcript</option>
-              <option value="Certificate">Certificate</option>
-              <option value="Enrollment">Enrollment</option>
+              <option value="Personal Data">Personal Data</option>
+              <option value="Appointment">Appointment</option>
+              <option value="Educational Qualifications">Educational Qualifications</option>
+              <option value="Learning & Development">Learning & Development</option>
+              <option value="Performance">Performance</option>
+              <option value="Service Records">Service Records</option>
               <option value="Medical">Medical</option>
+              <option value="Administrative">Administrative</option>
               <option value="Other">Other</option>
             </select>
           </div>

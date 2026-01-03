@@ -11,6 +11,7 @@ import LoadingSpinner from "../general/LoadingSpinner";
 import { EmployeeFilesNavbar } from "@/app/layouts/EmployeeNavbar";
 
 import { FilePreview } from "@/app/layouts/Preview/FilePreview";
+import UploadEmployeeFileModal from "../modals/UploadEmployeeFileModal";
 
 export default function EmployeeFiles() {
   const { employeeId } = useParams<{ employeeId: string }>();
@@ -20,6 +21,8 @@ export default function EmployeeFiles() {
   const [selectedFile, setSelectedFile] = useState<FileRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [employee, setEmployee] = useState<Employee | null>(null);
+
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   useEffect(() => {
     if (!employeeId) return;
@@ -43,8 +46,13 @@ export default function EmployeeFiles() {
     fetchEmployeeAndFiles();
   }, [employeeId]);
 
-  const handleUploadFile = () => {
-    console.log("Upload file clicked");
+  const handleUploadModal = () => {
+    setShowUploadModal(true);
+  };
+
+  const handleUploaded = async () => {
+    const updatedFiles = await getFilesByEmployeeId(employeeId!);
+    setFiles(updatedFiles);
   };
 
   if (loading) return <LoadingSpinner label="Loading employee files..." />;
@@ -67,7 +75,7 @@ export default function EmployeeFiles() {
                   </p>
                 </div>
                 <button
-                  onClick={handleUploadFile}
+                  onClick={handleUploadModal}
                   className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,6 +102,14 @@ export default function EmployeeFiles() {
           )}
         </RightBar>
       </div>
+
+      {showUploadModal && employeeId && (
+        <UploadEmployeeFileModal
+          employeeId={employeeId}
+          onClose={() => setShowUploadModal(false)}
+          onUploaded={handleUploaded}
+        />
+      )}
     </div>
   );
 }

@@ -1,22 +1,46 @@
-// CreateEmployeeModal.tsx
 import { useState } from "react";
 import { X } from "lucide-react";
-import type { Employee } from "@/types/Employee";
 
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+
+import type { Employee } from "@/types/Employee";
 import { createEmployee } from "@/services/employee.services";
+
+/* ----------------------------- helpers ----------------------------- */
+
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <label className="text-xs font-medium text-slate-700">{label}</label>
+      {children}
+      {error && <p className="text-[11px] text-red-600">{error}</p>}
+    </div>
+  );
+}
+
+/* ----------------------------- types ----------------------------- */
 
 interface CreateEmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  //   onSubmit: (employee: Employee) => void;
 }
 
+type Step = 1 | 2 | 3 | 4 | 5;
+
+/* ----------------------------- component ----------------------------- */
+
 export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeModalProps) {
-  const [formData, setFormData] = useState<Omit<Employee, "employeeId" | "createdAt" | "updatedAt">>({
+  const [step, setStep] = useState<Step>(1);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [form, setForm] = useState<Omit<Employee, "employeeId" | "createdAt" | "updatedAt">>({
     fullName: "",
     sex: "Male",
     dateOfBirth: "",
-    age: undefined,
+    age: null,
+
     itemNumber: "",
     positionTitle: "",
     salaryGrade: "",
@@ -25,228 +49,219 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
     natureOfAppointment: "",
     originalAppointmentDate: "",
     latestAppointmentDate: "",
-    education: { bachelor: "", major: "", master: "", doctorate: "" },
-    userId: "",
+
+    education: undefined, // ✅ optional by design
+
+    userId: null,
+
+    employeeNumber: "",
+    tin: "",
+    gsisBPNumber: "",
+    philHealthNumber: "",
+    pagIbigMIDNumber: "",
+    landbankAccountNumber: "",
   });
 
-  // Calculate age from DOB
-  const calculateAge = (dob: string) => {
-    if (!dob) return undefined;
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
+  /* ----------------------------- utils ----------------------------- */
 
   const handleChange = (key: keyof Employee, value: any) => {
-    if (key === "dateOfBirth") {
-      const age = calculateAge(value);
-      setFormData((prev) => ({ ...prev, dateOfBirth: value, age }));
-    } else {
-      setFormData((prev) => ({ ...prev, [key]: value }));
-    }
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleEducationChange = (key: keyof Employee["education"], value: string) => {
-    setFormData((prev) => ({
+  const handleDigitsOnly = (key: keyof Employee, max: number, value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, max);
+    handleChange(key, digits);
+  };
+
+  const handleEducationChange = (key: keyof NonNullable<Employee["education"]>, value: string) => {
+    setForm((prev) => ({
       ...prev,
-      education: { ...prev.education, [key]: value },
+      education: {
+        ...(prev.education ?? {}),
+        [key]: value,
+      },
     }));
   };
 
+  const validateGovernmentIDs = () => {
+    const e: Record<string, string> = {};
+
+    if (form.employeeNumber && !/^\d{7}$/.test(form.employeeNumber)) e.employeeNumber = "Must be 7 digits";
+
+    if (form.tin && !/^\d{9}$/.test(form.tin)) e.tin = "Must be 9 digits";
+
+    if (form.gsisBPNumber && !/^\d{11}$/.test(form.gsisBPNumber)) e.gsisBPNumber = "Must be 11 digits";
+
+    if (form.philHealthNumber && !/^\d{12}$/.test(form.philHealthNumber)) e.philHealthNumber = "Must be 12 digits";
+
+    if (form.pagIbigMIDNumber && !/^\d{12}$/.test(form.pagIbigMIDNumber)) e.pagIbigMIDNumber = "Must be 12 digits";
+
+    if (form.landbankAccountNumber && !/^\d{10}$/.test(form.landbankAccountNumber))
+      e.landbankAccountNumber = "Must be 10 digits";
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleSubmit = async () => {
-    try {
-      await createEmployee({
-        ...formData,
-        age: formData.age ?? null, // Replace undefined with null
-        userId: null, // Replace empty string or undefined with null
-      });
-
-      // Reset form
-      setFormData({
-        fullName: "",
-        sex: "Male",
-        dateOfBirth: "",
-        age: null,
-        itemNumber: "",
-        positionTitle: "",
-        salaryGrade: "",
-        step: "",
-        employmentStatus: "",
-        natureOfAppointment: "",
-        originalAppointmentDate: "",
-        latestAppointmentDate: "",
-        education: { bachelor: "", major: "", master: "", doctorate: "" },
-        userId: null,
-      });
-
-      onClose();
-    } catch (err: any) {
-      console.error("Failed to create employee:", err);
+    if (!validateGovernmentIDs()) {
+      setStep(4);
+      return;
     }
+
+    await createEmployee({
+      ...form,
+      education: form.education && Object.values(form.education).some(Boolean) ? form.education : undefined,
+    });
+
+    onClose();
   };
 
   if (!isOpen) return null;
 
+  /* ----------------------------- UI ----------------------------- */
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 sm:p-6">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl overflow-y-auto max-h-[90vh] relative p-6">
-        {/* Close Button */}
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-          <X size={20} />
-        </button>
-
-        <h2 className="text-2xl font-bold text-slate-800 mb-6">Create Employee</h2>
-
-        {/* Employee Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Full Name</label>
-            <input
-              type="text"
-              value={formData.fullName}
-              onChange={(e) => handleChange("fullName", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Sex</label>
-            <select
-              value={formData.sex}
-              onChange={(e) => handleChange("sex", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-            >
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Date of Birth</label>
-            <input
-              type="date"
-              value={formData.dateOfBirth}
-              onChange={(e) => handleChange("dateOfBirth", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Age</label>
-            <input
-              type="number"
-              value={formData.age ?? ""}
-              readOnly
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-gray-50 cursor-not-allowed"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Position Title</label>
-            <input
-              type="text"
-              value={formData.positionTitle}
-              onChange={(e) => handleChange("positionTitle", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Salary Grade</label>
-            <input
-              type="text"
-              value={formData.salaryGrade}
-              onChange={(e) => handleChange("salaryGrade", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Step</label>
-            <input
-              type="text"
-              value={formData.step}
-              onChange={(e) => handleChange("step", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Employment Status</label>
-            <input
-              type="text"
-              value={formData.employmentStatus}
-              onChange={(e) => handleChange("employmentStatus", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Nature of Appointment</label>
-            <input
-              type="text"
-              value={formData.natureOfAppointment}
-              onChange={(e) => handleChange("natureOfAppointment", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Original Appointment Date</label>
-            <input
-              type="date"
-              value={formData.originalAppointmentDate}
-              onChange={(e) => handleChange("originalAppointmentDate", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Latest Appointment Date</label>
-            <input
-              type="date"
-              value={formData.latestAppointmentDate}
-              onChange={(e) => handleChange("latestAppointmentDate", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-            />
-          </div>
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-3">
+      <div className="bg-white w-full max-w-lg rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <h2 className="text-sm font-semibold">Create Employee</h2>
+          <button onClick={onClose}>
+            <X className="w-4 h-4 text-gray-500" />
+          </button>
         </div>
 
-        {/* Education Section */}
-        <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-700">Education</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {["bachelor", "major", "master", "doctorate"].map((field) => (
-            <div key={field}>
-              <label className="block text-sm font-medium mb-1 capitalize">{field}</label>
-              <input
-                type="text"
-                value={formData.education?.[field as keyof Employee["education"]] || ""}
-                onChange={(e) => handleEducationChange(field as keyof Employee["education"], e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-              />
-            </div>
-          ))}
+        {/* Progress */}
+        <div className="px-4 py-2 text-[11px] text-gray-500">Step {step} of 5</div>
+
+        {/* Content */}
+        <div className="px-4 pb-4 space-y-4">
+          {/* STEP 1 – Personal */}
+          {step === 1 && (
+            <>
+              <Field label="Full Name">
+                <Input value={form.fullName} onChange={(e) => handleChange("fullName", e.target.value)} />
+              </Field>
+
+              <Field label="Sex">
+                <Select value={form.sex} onValueChange={(v) => handleChange("sex", v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+
+              <Field label="Date of Birth">
+                <Input
+                  type="date"
+                  value={form.dateOfBirth}
+                  onChange={(e) => handleChange("dateOfBirth", e.target.value)}
+                />
+              </Field>
+            </>
+          )}
+
+          {/* STEP 2 – Employment */}
+          {step === 2 && (
+            <>
+              <Field label="Position Title">
+                <Input value={form.positionTitle} onChange={(e) => handleChange("positionTitle", e.target.value)} />
+              </Field>
+
+              <Field label="Salary Grade">
+                <Input value={form.salaryGrade} onChange={(e) => handleChange("salaryGrade", e.target.value)} />
+              </Field>
+
+              <Field label="Employment Status">
+                <Input
+                  value={form.employmentStatus}
+                  onChange={(e) => handleChange("employmentStatus", e.target.value)}
+                />
+              </Field>
+            </>
+          )}
+
+          {/* STEP 3 – Education */}
+          {step === 3 && (
+            <>
+              {(["bachelor", "major", "master", "doctorate"] as const).map((key) => (
+                <Field key={key} label={key.toUpperCase()}>
+                  <Input
+                    value={form.education?.[key] ?? ""}
+                    onChange={(e) => handleEducationChange(key, e.target.value)}
+                  />
+                </Field>
+              ))}
+            </>
+          )}
+
+          {/* STEP 4 – Government IDs */}
+          {step === 4 && (
+            <>
+              <Field label="Employee Number" error={errors.employeeNumber}>
+                <Input
+                  value={form.employeeNumber}
+                  maxLength={7}
+                  onChange={(e) => handleDigitsOnly("employeeNumber", 7, e.target.value)}
+                />
+              </Field>
+
+              <Field label="TIN" error={errors.tin}>
+                <Input value={form.tin} maxLength={9} onChange={(e) => handleDigitsOnly("tin", 9, e.target.value)} />
+              </Field>
+
+              <Field label="GSIS BP Number" error={errors.gsisBPNumber}>
+                <Input
+                  value={form.gsisBPNumber}
+                  maxLength={11}
+                  onChange={(e) => handleDigitsOnly("gsisBPNumber", 11, e.target.value)}
+                />
+              </Field>
+
+              <Field label="PhilHealth Number" error={errors.philHealthNumber}>
+                <Input
+                  value={form.philHealthNumber}
+                  maxLength={12}
+                  onChange={(e) => handleDigitsOnly("philHealthNumber", 11, e.target.value)}
+                />
+              </Field>
+
+              <Field label="PAG-IBIG Number" error={errors.pagIbigMIDNumber}>
+                <Input
+                  value={form.pagIbigMIDNumber}
+                  maxLength={12}
+                  onChange={(e) => handleDigitsOnly("pagIbigMIDNumber", 11, e.target.value)}
+                />
+              </Field>
+            </>
+          )}
+
+          {/* STEP 5 – Review */}
+          {step === 5 && <p className="text-xs text-slate-600">Review the information and click “Create Employee”.</p>}
         </div>
 
-        {/* Buttons */}
-        <div className="mt-6 flex justify-end gap-3 flex-wrap">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg border text-sm hover:bg-gray-100 flex-1 sm:flex-none"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-primary/90 flex-1 sm:flex-none"
-          >
-            Add Employee
-          </button>
+        {/* Footer */}
+        <div className="flex gap-2 px-4 py-3 border-t">
+          {step > 1 && (
+            <Button variant="outline" className="flex-1" onClick={() => setStep((s) => (s - 1) as Step)}>
+              Back
+            </Button>
+          )}
+
+          {step < 5 ? (
+            <Button className="flex-1" onClick={() => setStep((s) => (s + 1) as Step)}>
+              Next
+            </Button>
+          ) : (
+            <Button className="flex-1" onClick={handleSubmit}>
+              Create Employee
+            </Button>
+          )}
         </div>
       </div>
     </div>

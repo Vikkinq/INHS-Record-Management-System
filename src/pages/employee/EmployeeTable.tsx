@@ -14,7 +14,7 @@ export default function EmployeeTable({ employeeData, onRowClick }: EmployeeTabl
           className="border-t hover:bg-muted/50 transition-colors"
           onClick={() => onRowClick(employee)}
         >
-          <td className="px-4 py-3 text-xs text-slate-500">{employee.employeeId} </td>
+          <td className="px-4 py-3 text-xs text-slate-500">{employee.employeeNumber} </td>
 
           <td className="px-4 py-3 font-medium">
             {/* If fullName exists in Firestore */}
