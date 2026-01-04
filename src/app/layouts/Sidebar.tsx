@@ -1,5 +1,5 @@
 import { logout } from "../../services/auth.services";
-import { Upload, File, Users, HelpCircle, LogOut, Files } from "lucide-react";
+import { Upload, File, Users, HelpCircle, LogOut, DownloadCloud, Files } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // import { useAuth } from "@/context/AuthContext";
 
@@ -12,6 +12,7 @@ type SidebarProps = {
   setRecordFilter?: (value: "all" | "mine" | "recent") => void;
   onToggleView: (value: "files" | "employees") => void;
   activeView: "files" | "employees";
+  onDownloadAll?: () => void;
 };
 
 export default function Sidebar({
@@ -22,6 +23,8 @@ export default function Sidebar({
   setRecordFilter,
   onToggleView,
   activeView,
+  role,
+  onDownloadAll,
 }: SidebarProps) {
   // const { user } = useAuth();
 
@@ -56,12 +59,19 @@ export default function Sidebar({
         {/* New Button */}
         <div className="p-4">
           <Button
-            className="w-full justify-start gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full justify-start gap-2 bg-primary text-primary-foreground hover:bg-primary/90 my-2"
             onClick={onClick}
           >
             <Upload className="w-5 h-5" />
             Upload
           </Button>
+
+          {role === "admin" && (
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={onDownloadAll}>
+              <DownloadCloud className="w-5 h-5" />
+              Download All
+            </Button>
+          )}
         </div>
 
         {/* Navigation */}

@@ -24,6 +24,7 @@ import { useToast } from "@/components/general/Toast";
 import { useAuth } from "../../context/AuthContext";
 import type { FileRecord } from "@/types/Files";
 import { getFiles, deleteFile } from "@/services/file.services";
+import { downloadAllFiles } from "@/services/download.services";
 
 type ModalType = "addRecord" | "updateRecord" | "createUser" | "help" | "createEmployee" | null;
 type RightBarView = { type: "file"; data: FileRecord } | { type: "employee"; data: Employee } | null;
@@ -83,6 +84,17 @@ export default function MainPage() {
     }
   };
 
+  const handleDownloadAll = async () => {
+    if (!window.confirm("Download all files?")) return;
+
+    try {
+      await downloadAllFiles(files);
+    } catch (err) {
+      console.error("Download failed:", err);
+      alert("Failed to download files.");
+    }
+  };
+
   // const toggleView = () => {
   //   setActiveView((prev) => (prev === "files" ? "employees" : "files"));
   // };
@@ -129,6 +141,7 @@ export default function MainPage() {
         setRecordFilter={setRecordFilter}
         onToggleView={setActiveView}
         activeView={activeView}
+        onDownloadAll={handleDownloadAll}
       />
 
       {/* Mobile overlay for sidebar */}
