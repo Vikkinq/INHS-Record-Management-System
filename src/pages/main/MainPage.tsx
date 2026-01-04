@@ -26,6 +26,8 @@ import type { FileRecord } from "@/types/Files";
 import { getFiles, deleteFile } from "@/services/file.services";
 import { downloadAllFiles } from "@/services/download.services";
 
+import { getEmployees } from "@/services/employee.services";
+
 type ModalType = "addRecord" | "updateRecord" | "createUser" | "help" | "createEmployee" | null;
 type RightBarView = { type: "file"; data: FileRecord } | { type: "employee"; data: Employee } | null;
 
@@ -88,7 +90,8 @@ export default function MainPage() {
     if (!window.confirm("Download all files?")) return;
 
     try {
-      await downloadAllFiles(files);
+      const employees = await getEmployees(); // fetch employee list
+      await downloadAllFiles(files, employees); // pass employees for folder mapping
     } catch (err) {
       console.error("Download failed:", err);
       alert("Failed to download files.");
