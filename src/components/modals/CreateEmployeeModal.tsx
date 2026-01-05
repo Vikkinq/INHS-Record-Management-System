@@ -227,7 +227,7 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
                 <Input
                   value={form.philHealthNumber}
                   maxLength={12}
-                  onChange={(e) => handleDigitsOnly("philHealthNumber", 11, e.target.value)}
+                  onChange={(e) => handleDigitsOnly("philHealthNumber", 12, e.target.value)}
                 />
               </Field>
 
@@ -235,7 +235,7 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
                 <Input
                   value={form.pagIbigMIDNumber}
                   maxLength={12}
-                  onChange={(e) => handleDigitsOnly("pagIbigMIDNumber", 11, e.target.value)}
+                  onChange={(e) => handleDigitsOnly("pagIbigMIDNumber", 12, e.target.value)}
                 />
               </Field>
             </>
