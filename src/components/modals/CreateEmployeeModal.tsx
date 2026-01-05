@@ -7,8 +7,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 
 import type { Employee } from "@/types/Employee";
 import { createEmployee } from "@/services/employee.services";
-
-/* ----------------------------- helpers ----------------------------- */
+import { calculateAge } from "@/utils/employee_updates.utils";
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
@@ -20,16 +19,12 @@ function Field({ label, error, children }: { label: string; error?: string; chil
   );
 }
 
-/* ----------------------------- types ----------------------------- */
-
 interface CreateEmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
 type Step = 1 | 2 | 3 | 4 | 5;
-
-/* ----------------------------- component ----------------------------- */
 
 export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeModalProps) {
   const [step, setStep] = useState<Step>(1);
@@ -50,7 +45,7 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
     originalAppointmentDate: "",
     latestAppointmentDate: "",
 
-    education: undefined, // ✅ optional by design
+    education: {},
 
     userId: null,
 
@@ -62,10 +57,14 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
     landbankAccountNumber: "",
   });
 
-  /* ----------------------------- utils ----------------------------- */
-
   const handleChange = (key: keyof Employee, value: any) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm((prev) => {
+      const updated = { ...prev, [key]: value };
+      if (key === "dateOfBirth" && value) {
+        updated.age = calculateAge(value);
+      }
+      return updated;
+    });
   };
 
   const handleDigitsOnly = (key: keyof Employee, max: number, value: string) => {
@@ -87,15 +86,10 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
     const e: Record<string, string> = {};
 
     if (form.employeeNumber && !/^\d{7}$/.test(form.employeeNumber)) e.employeeNumber = "Must be 7 digits";
-
     if (form.tin && !/^\d{9}$/.test(form.tin)) e.tin = "Must be 9 digits";
-
     if (form.gsisBPNumber && !/^\d{11}$/.test(form.gsisBPNumber)) e.gsisBPNumber = "Must be 11 digits";
-
     if (form.philHealthNumber && !/^\d{12}$/.test(form.philHealthNumber)) e.philHealthNumber = "Must be 12 digits";
-
     if (form.pagIbigMIDNumber && !/^\d{12}$/.test(form.pagIbigMIDNumber)) e.pagIbigMIDNumber = "Must be 12 digits";
-
     if (form.landbankAccountNumber && !/^\d{10}$/.test(form.landbankAccountNumber))
       e.landbankAccountNumber = "Must be 10 digits";
 
@@ -109,18 +103,23 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
       return;
     }
 
-    await createEmployee({
-      ...form,
-      education: form.education && Object.values(form.education).some(Boolean) ? form.education : undefined,
-    });
+    try {
+      // Only include education if it has at least one non-empty value
+      const employeeData = {
+        ...form,
+        ...(form.education && Object.values(form.education).some(Boolean) ? { education: form.education } : {}),
+      };
 
-    onClose();
+      await createEmployee(employeeData);
+      onClose();
+    } catch (err) {
+      console.error("Failed to create employee:", err);
+    }
   };
 
   if (!isOpen) return null;
 
   /* ----------------------------- UI ----------------------------- */
-
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-3">
       <div className="bg-white w-full max-w-lg rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
@@ -147,7 +146,7 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
               <Field label="Sex">
                 <Select value={form.sex} onValueChange={(v) => handleChange("sex", v)}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select Sex" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Male">Male</SelectItem>
@@ -162,6 +161,10 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
                   value={form.dateOfBirth}
                   onChange={(e) => handleChange("dateOfBirth", e.target.value)}
                 />
+              </Field>
+
+              <Field label="Age">
+                <Input value={form.age ?? ""} readOnly />
               </Field>
             </>
           )}
@@ -178,10 +181,16 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
               </Field>
 
               <Field label="Employment Status">
-                <Input
-                  value={form.employmentStatus}
-                  onChange={(e) => handleChange("employmentStatus", e.target.value)}
-                />
+                <Select value={form.employmentStatus} onValueChange={(v) => handleChange("employmentStatus", v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Permanent">Permanent</SelectItem>
+                    <SelectItem value="Part-Time">Part-Time</SelectItem>
+                    <SelectItem value="Temporary">Temporary</SelectItem>
+                  </SelectContent>
+                </Select>
               </Field>
             </>
           )}
@@ -236,6 +245,14 @@ export default function CreateEmployeeModal({ isOpen, onClose }: CreateEmployeeM
                   value={form.pagIbigMIDNumber}
                   maxLength={12}
                   onChange={(e) => handleDigitsOnly("pagIbigMIDNumber", 12, e.target.value)}
+                />
+              </Field>
+
+              <Field label="Landbank Account Number" error={errors.landbankAccountNumber}>
+                <Input
+                  value={form.landbankAccountNumber}
+                  maxLength={10}
+                  onChange={(e) => handleDigitsOnly("landbankAccountNumber", 10, e.target.value)}
                 />
               </Field>
             </>

@@ -19,17 +19,14 @@ service cloud.firestore {
 
     // Employees collection
     match /employees/{employeeId} {
-      // Any authenticated user can read
-      allow read: if request.auth != null;
+  // Any authenticated user can read
+  allow read: if request.auth != null;
 
-      // Any authenticated user can create
-      allow create: if request.auth != null;
+  // Any authenticated user can create
+  allow create: if request.auth != null;
 
-      // Update/Delete: admin or the employee themselves
-      allow update, delete: if request.auth != null && (
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin" ||
-        resource.data.userId == request.auth.uid
-      );
-    }
+  // Update/Delete: any authenticated user (admin or staff)
+  allow update, delete: if request.auth != null;
+}
   }
 }
