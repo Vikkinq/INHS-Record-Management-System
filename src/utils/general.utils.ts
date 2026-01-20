@@ -23,3 +23,9 @@ export function canEditEmployee(employee: Employee | null, user: UserProfile | n
 
   return user?.role === "admin" || employee?.userId === user.uid || user?.role === "staff";
 }
+
+export function canDeleteEmployee(employee: Employee | null, user: UserProfile | null) {
+  if (!user) return false;
+
+  return user?.role === "admin" || employee?.userId === user.uid;
+}

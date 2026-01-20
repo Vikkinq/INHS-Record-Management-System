@@ -2,7 +2,7 @@ import { formatDate } from "@/utils/general.utils";
 import { useEffect, useState } from "react";
 
 import { useAuth } from "@/context/AuthContext";
-import { canEditEmployee } from "@/utils/general.utils";
+import { canEditEmployee, canDeleteEmployee } from "@/utils/general.utils";
 import { deleteEmployee } from "@/services/employee.services";
 
 import { useNavigate, useParams } from "react-router-dom";
@@ -34,6 +34,7 @@ export default function EmployeeProfilePage() {
   // Edit States
   const [editSection, setEditSection] = useState<EmployeeEditSection | null>(null);
   const canEdit = canEditEmployee(employee, user);
+  const canDelete = canDeleteEmployee(employee, user);
 
   const handleUpdate = async (section: EmployeeEditSection, data: Partial<Employee>) => {
     if (!employee || !canEdit) return;
@@ -135,7 +136,7 @@ export default function EmployeeProfilePage() {
               SEE {fileCount} FILES
             </button>
 
-            {canEdit && (
+            {canDelete && (
               <button
                 onClick={() => handleDeleteEmployee(employee.employeeId)}
                 className="rounded-lg border border-red-600 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
