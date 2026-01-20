@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import { useAuth } from "@/context/AuthContext";
 import { canEditEmployee } from "@/utils/general.utils";
+import { deleteEmployee } from "@/services/employee.services";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, User, Briefcase, Calendar, GraduationCap, Info, FileText } from "lucide-react";
@@ -15,10 +16,12 @@ import { EMPLOYEE_SECTION_FIELDS, calculateAge } from "@/utils/employee_updates.
 import UpdateEmployeeModal from "@/components/modals/UpdateEmployeeModal";
 
 import LoadingSpinner from "@/components/general/LoadingSpinner";
+import { useToast } from "@/components/general/Toast";
 
 export type EmployeeEditSection = "personal" | "employment" | "government" | "appointment" | "education";
 
 export default function EmployeeProfilePage() {
+  const { addToast } = useToast();
   const navigate = useNavigate();
   const { employeeId } = useParams(); // /employee/:employeeId
   const { user } = useAuth();
@@ -97,6 +100,19 @@ export default function EmployeeProfilePage() {
     </div>
   );
 
+  const handleDeleteEmployee = async (employeeId: string) => {
+    if (!window.confirm("Are you sure you want to delete this Employee?")) return;
+    try {
+      await deleteEmployee(employeeId);
+      alert("Employee Deleted!");
+      addToast(`Employee ${employee.fullName} has been Successfully Deleted`, "success");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      addToast(`Employee ${employee.fullName} failed to be Deleted`, "error");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -110,13 +126,24 @@ export default function EmployeeProfilePage() {
             <span className="text-sm font-medium">Back to Employee List</span>
           </button>
 
-          <button
-            onClick={() => navigate(`/employee/${employee.employeeId}/files`)}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-          >
-            <FileText className="w-4 h-4" />
-            SEE {fileCount} FILES
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(`/employee/${employee.employeeId}/files`)}
+              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              <FileText className="w-4 h-4" />
+              SEE {fileCount} FILES
+            </button>
+
+            {canEdit && (
+              <button
+                onClick={() => handleDeleteEmployee(employee.employeeId)}
+                className="rounded-lg border border-red-600 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              >
+                Delete Employee
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

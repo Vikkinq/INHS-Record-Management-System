@@ -1,5 +1,16 @@
 import { db } from "@/config/firebase";
-import { collection, addDoc, getDocs, getDoc, doc, serverTimestamp, query, where, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  doc,
+  serverTimestamp,
+  query,
+  where,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 
 import type { Employee } from "@/types/Employee";
 import type { FileRecord } from "@/types/Files";
@@ -76,3 +87,18 @@ export const updateEmployee = async (employeeId: string, payload: Partial<Employ
     ...payload,
   } as Employee;
 };
+
+// DELETE
+export async function deleteEmployee(employeeId: string): Promise<void> {
+  if (!employeeId) {
+    throw new Error("Employee ID is required");
+  }
+
+  try {
+    const ref = doc(db, "employees", employeeId);
+    await deleteDoc(ref);
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+    throw error;
+  }
+}
