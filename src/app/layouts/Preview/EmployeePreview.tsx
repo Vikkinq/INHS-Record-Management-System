@@ -35,8 +35,8 @@ export default function EmployeePreview({ employee, onSeeProfile, onSeeFiles }: 
             <span className="font-medium">{employee.sex}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-500">Employee ID</span>
-            <span className="font-medium">{employee.employeeId}</span>
+            <span className="text-gray-500">Employee Number</span>
+            <span className="font-medium">{employee.employeeNumber}</span>
           </div>
         </div>
       </div>

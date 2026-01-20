@@ -24,7 +24,6 @@ export default function EmployeeFilesTableList({ paginatedData, onFileClick }: E
               {file.fileName}
             </div>
           </td>
-          <td className="px-6 py-3 text-gray-600 uppercase text-xs font-medium">{file.employeeId}</td>
           <td className="px-6 py-3 text-gray-600 uppercase text-xs font-medium">{file.category}</td>
           <td className="px-6 py-3 text-gray-600 uppercase text-xs font-medium">{file.fileType}</td>
           <td className="px-6 py-3 text-gray-600">{formatFileSize(file.fileSize)}</td>

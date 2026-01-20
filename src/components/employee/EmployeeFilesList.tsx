@@ -131,7 +131,7 @@ export default function EmployeeFilesList({ files, onFileClick }: EmployeeFilesP
                 <table className="w-full text-sm min-w-225">
                   <thead className="bg-gray-50 border-b">
                     <tr>
-                      {["Name", "Owner", "Category", "Type", "Size", "Date Modified"].map((h) => (
+                      {["Name", "Category", "Type", "Size", "Date Modified"].map((h) => (
                         <th
                           key={h}
                           className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-700"
